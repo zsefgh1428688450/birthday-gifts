@@ -159,6 +159,45 @@ body{font-family:'Noto Serif SC',serif;color:var(--ink);background:var(--paper);
   .fs-item{gap:12px}
   #timeline,#friendship,#letter{padding:64px 16px}
 }
+
+/* ===== EASTER EGG: INK WASH REVEAL ===== */
+#poem-reveal{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;overflow:hidden}
+#poem-reveal.show{display:flex}
+
+.reveal-ink-bg{position:absolute;inset:0;background:var(--paper);z-index:0}
+
+.reveal-ink{position:absolute;border-radius:50%;z-index:1;pointer-events:none;
+  background:radial-gradient(circle,rgba(35,30,25,.88) 0%,rgba(44,44,44,.55) 25%,rgba(60,55,50,.2) 55%,transparent 75%)}
+
+.reveal-ink.dropping{animation:ink-bloom var(--dur,2s) cubic-bezier(.22,.61,.36,1) var(--delay,0s) forwards}
+@keyframes ink-bloom{
+  0%{transform:translate(-50%,-50%) scale(0);opacity:.92}
+  35%{transform:translate(-50%,-50%) scale(.5);opacity:.7}
+  65%{transform:translate(-50%,-50%) scale(.85);opacity:.35}
+  100%{transform:translate(-50%,-50%) scale(1.15);opacity:0}
+}
+
+.reveal-letter{position:relative;z-index:2;opacity:0;transition:opacity 2s ease .5s;text-align:center;max-width:480px;padding:40px 32px;pointer-events:none}
+.reveal-letter.vis{opacity:1;pointer-events:auto}
+
+.reveal-ch{font-size:10px;color:var(--red);letter-spacing:8px;opacity:0;transform:translateY(8px);transition:opacity .6s .8s,transform .6s .8s}
+.reveal-letter.vis .reveal-ch{opacity:.8;transform:translateY(0)}
+
+.reveal-title{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(1.2rem,3.5vw,1.5rem);color:var(--ink);letter-spacing:.25em;margin-bottom:36px;opacity:0;transform:translateY(12px);transition:opacity .8s 1.2s,transform .8s 1.2s}
+.reveal-letter.vis .reveal-title{opacity:1;transform:translateY(0)}
+
+.reveal-seal{display:inline-block;border:2px solid var(--red);color:var(--red);padding:3px 8px;font-size:14px;font-family:'ZCOOL XiaoWei',serif;transform:rotate(-5deg);margin-bottom:20px;opacity:0;transition:opacity .5s 1s}
+.reveal-letter.vis .reveal-seal{opacity:.7}
+
+.reveal-body{font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;font-size:clamp(15px,2.5vw,17px);line-height:2.6;color:var(--ink);letter-spacing:.05em;opacity:0;transform:translateY(8px);transition:opacity 1s 1.8s,transform 1s 1.8s}
+.reveal-letter.vis .reveal-body{opacity:1;transform:translateY(0)}
+
+.reveal-sig{font-family:'ZCOOL XiaoWei',serif;font-size:13px;color:var(--gold);margin-top:32px;letter-spacing:.12em;opacity:0;transition:opacity .8s 2.6s}
+.reveal-letter.vis .reveal-sig{opacity:.75}
+
+.reveal-close{margin-top:28px;font-size:11px;color:var(--ink-ll);letter-spacing:2px;cursor:pointer;opacity:0;transition:opacity .5s 3.2s}
+.reveal-letter.vis .reveal-close{opacity:.5}
+.reveal-close:hover{opacity:1!important}
 </style>
 </head>
 <body>
@@ -410,6 +449,32 @@ body{font-family:'Noto Serif SC',serif;color:var(--ink);background:var(--paper);
   <span style="font-size:10px;opacity:.5">2026</span>
 </footer>
 
+<!-- EASTER EGG: INK WASH REVEAL -->
+<div id="poem-reveal">
+  <div class="reveal-ink-bg"></div>
+  <div class="reveal-letter">
+    <div class="reveal-seal">秘</div>
+    <div class="reveal-ch">第 八 首 诗</div>
+    <div class="reveal-title">此刻 · 二〇二六</div>
+    <div class="reveal-body">
+      三千年的诗，你一首一首地答完了。<br>
+      从《木瓜》到《定风波》，<br>
+      从陶渊明的竹林到苏东坡的雨里。<br><br>
+      七朝已过，此刻属于你。<br><br>
+      洛妍，<br>
+      以后你站在讲台上讲起这些诗的时候，<br>
+      记得有人曾把整条诗脉铺成了你的生日礼物。<br>
+      不是因为这些诗有多好，<br>
+      是因为你值得。<br><br>
+      生日快乐。<br>
+      愿你以后遇到的每一个少年，<br>
+      都因你而爱上语文。
+    </div>
+    <div class="reveal-sig">—— 写在你成为语文老师之前</div>
+    <div class="reveal-close">轻触收起</div>
+  </div>
+</div>
+
 <script>
 /* ===== COUNTDOWN ===== */
 const TARGET = new Date('2026-07-29T00:00:00+08:00').getTime();
@@ -463,6 +528,7 @@ document.querySelectorAll('.ink-divider').forEach(el=>inkObs.observe(el));
             setTimeout(()=>{
               document.getElementById('game-result').classList.add('show');
               document.getElementById('game-result').scrollIntoView({behavior:'smooth',block:'center'});
+              setTimeout(()=>triggerInkReveal(), 2200);
             }, 800);
           }
         } else {
@@ -513,6 +579,42 @@ document.querySelectorAll('.ink-divider').forEach(el=>inkObs.observe(el));
     tc.classList.add('unlocked');
   });
 })();
+
+/* ===== INK WASH REVEAL EASTER EGG ===== */
+function triggerInkReveal(){
+  var reveal = document.getElementById('poem-reveal');
+  var letter = reveal.querySelector('.reveal-letter');
+  reveal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  // Generate ink drops with randomized positions and timing
+  var positions = [
+    {x:48,y:44,s:3.2},{x:54,y:56,s:2.8},{x:36,y:38,s:2.2},{x:64,y:62,s:2.6},
+    {x:42,y:54,s:1.8},{x:58,y:40,s:2.4},{x:50,y:50,s:3.6},{x:32,y:58,s:1.6},
+    {x:68,y:46,s:2.0},{x:46,y:32,s:1.5},{x:52,y:68,s:1.7}
+  ];
+  positions.forEach(function(p,i){
+    var drop = document.createElement('div');
+    drop.className = 'reveal-ink';
+    var size = p.s * 280;
+    drop.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+p.x+'%;top:'+p.y+'%';
+    drop.style.setProperty('--delay', (i*0.18)+'s');
+    drop.style.setProperty('--dur', (1.6+Math.random()*1.2)+'s');
+    reveal.appendChild(drop);
+    void drop.offsetHeight;
+    drop.classList.add('dropping');
+  });
+
+  setTimeout(function(){
+    letter.classList.add('vis');
+  }, 3800);
+
+  reveal.querySelector('.reveal-close').addEventListener('click', function(){
+    letter.classList.remove('vis');
+    reveal.classList.remove('show');
+    document.body.style.overflow = '';
+  });
+}
 </script>
 </body>
 </html>
