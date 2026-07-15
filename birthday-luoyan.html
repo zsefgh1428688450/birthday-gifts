@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>给洛妍 · 诗词漫游</title>
+<script>
+/* CDN-optimized font loader: Chinese mirror → Google Fonts → system fallback */
+(function(){
+  var href='https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=ZCOOL+XiaoWei&display=swap';
+  var fb='https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=ZCOOL+XiaoWei&display=swap';
+  var link=document.createElement('link');
+  link.rel='stylesheet';link.href=href;
+  var timer=setTimeout(function(){link.remove()},5000);
+  link.onload=function(){clearTimeout(timer)};
+  link.onerror=function(){
+    clearTimeout(timer);link.remove();
+    var f=document.createElement('link');
+    f.rel='stylesheet';f.href=fb;
+    document.head.appendChild(f);
+  };
+  document.head.appendChild(link);
+})();
+</script>
+<style>
+:root{
+  --ink:#2c2c2c;--ink-l:#5a5a5a;--ink-ll:#999;
+  --red:#b8383b;--gold:#c4956a;
+  --paper:#faf6f0;--paper-d:#f0ebe3;
+  --wash:rgba(44,44,44,.04);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',serif;color:var(--ink);background:var(--paper);overflow-x:hidden;line-height:1.9}
+::selection{background:rgba(184,56,59,.15)}
+
+/* ===== HERO ===== */
+#hero{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;background:var(--paper)}
+#hero::before{content:'';position:absolute;top:10%;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(44,44,44,.06) 0%,transparent 70%);border-radius:50%}
+#hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(transparent,var(--paper))}
+.hero-seal{width:60px;height:60px;border:2.5px solid var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--red);font-weight:700;margin-bottom:40px;transform:rotate(-5deg);font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;letter-spacing:2px;line-height:1}
+.hero-title{font-size:clamp(2.2rem,6vw,3.8rem);font-weight:700;letter-spacing:.2em;margin-bottom:16px;color:var(--ink)}
+.hero-sub{font-size:clamp(.85rem,1.8vw,1rem);color:var(--ink-ll);letter-spacing:.12em;margin-bottom:56px}
+.countdown{display:flex;gap:clamp(16px,4vw,40px);font-family:'ZCOOL XiaoWei','Noto Serif SC',serif}
+.cd-box{text-align:center}
+.cd-num{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;color:var(--ink);line-height:1}
+.cd-lab{font-size:11px;color:var(--ink-ll);letter-spacing:3px;margin-top:8px}
+.scroll-hint{position:absolute;bottom:40px;font-size:12px;color:var(--ink-ll);letter-spacing:2px;animation:float 2.5s ease-in-out infinite;z-index:1}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ===== TIMELINE SECTION ===== */
+#timeline{padding:80px 20px 60px;position:relative}
+.tl-header{text-align:center;margin-bottom:80px}
+.tl-header h2{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:700;letter-spacing:.15em;color:var(--ink)}
+.tl-header p{font-size:13px;color:var(--ink-ll);margin-top:8px;letter-spacing:.08em}
+
+/* Timeline line */
+.tl-line{position:relative;max-width:720px;margin:0 auto}
+.tl-line::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,var(--ink-ll),var(--ink-ll),transparent);transform:translateX(-50%)}
+
+/* Era node */
+.era{position:relative;margin-bottom:100px;display:flex;align-items:flex-start}
+.era:last-child{margin-bottom:0}
+.era:nth-child(odd){flex-direction:row-reverse;text-align:right}
+.era:nth-child(even){text-align:left}
+
+/* Center dot */
+.era-dot{position:absolute;left:50%;top:24px;width:12px;height:12px;background:var(--paper);border:2px solid var(--red);border-radius:50%;transform:translateX(-50%);z-index:2;transition:.3s}
+.era:hover .era-dot{background:var(--red);box-shadow:0 0 0 4px rgba(184,56,59,.15)}
+
+/* Card */
+.era-card{width:calc(50% - 40px);padding:28px;background:var(--paper-d);border-radius:2px;position:relative;transition:all .4s}
+.era-card::before{content:'';position:absolute;inset:0;border:1px solid rgba(44,44,44,.06);border-radius:2px;pointer-events:none}
+.era:hover .era-card{background:#f5f0e8;box-shadow:0 8px 32px rgba(44,44,44,.06)}
+.era-dynasty{font-size:11px;color:var(--red);letter-spacing:3px;font-weight:600;margin-bottom:4px}
+.era-poet{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.era-title{font-size:13px;color:var(--ink-l);margin-bottom:16px}
+.era-verse{font-size:17px;line-height:2.2;color:var(--ink);padding:16px 0;border-top:1px solid rgba(44,44,44,.06);border-bottom:1px solid rgba(44,44,44,.06);margin-bottom:16px;font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;letter-spacing:.05em}
+.era-note{font-size:13px;color:var(--ink-l);line-height:2}
+
+/* ===== FRIENDSHIP SECTION ===== */
+#friendship{padding:100px 20px;background:linear-gradient(180deg,var(--paper),var(--paper-d))}
+.fs-header{text-align:center;margin-bottom:64px}
+.fs-header h2{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:700;letter-spacing:.15em}
+.fs-header p{font-size:13px;color:var(--ink-ll);margin-top:8px;letter-spacing:.08em}
+.fs-timeline{max-width:580px;margin:0 auto}
+.fs-item{display:flex;gap:24px;margin-bottom:40px;align-items:flex-start}
+.fs-year{font-family:'ZCOOL XiaoWei',serif;font-size:14px;color:var(--red);min-width:60px;padding-top:4px;flex-shrink:0}
+.fs-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-ll);margin-top:10px;flex-shrink:0}
+.fs-text{font-size:14px;color:var(--ink-l);line-height:2}
+.fs-text strong{color:var(--ink);font-weight:600}
+
+/* ===== LETTER ===== */
+#letter{padding:100px 20px;text-align:center}
+.letter-wrap{max-width:560px;margin:0 auto;text-align:left}
+.letter-wrap p{font-size:15px;line-height:2.2;color:var(--ink);margin-bottom:20px}
+.letter-sign{text-align:right;font-weight:600;color:var(--ink);margin-top:48px;font-size:15px}
+.letter-seal{display:inline-block;border:2px solid var(--red);color:var(--red);padding:4px 8px;font-size:13px;border-radius:2px;transform:rotate(-3deg);margin-top:12px;font-family:'ZCOOL XiaoWei',serif}
+
+/* ===== INK WASH DIVIDERS ===== */
+.ink-divider{position:relative;height:80px;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:visible;z-index:1}
+.ink-drop{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:0;transform:scale(0);transition:none}
+.ink-divider.active .ink-drop{animation:ink-spread 1.8s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes ink-spread{
+  0%{transform:scale(0);opacity:.5}
+  30%{transform:scale(8);opacity:.25}
+  60%{transform:scale(20);opacity:.1}
+  100%{transform:scale(35);opacity:0}
+}
+.ink-char{font-family:'ZCOOL XiaoWei',serif;font-size:24px;color:var(--ink);opacity:0;transform:translateY(10px);transition:opacity .8s .6s,transform .8s .6s;z-index:1;background:var(--paper);padding:0 12px;position:relative}
+.ink-divider.active .ink-char{opacity:.25;transform:translateY(0)}
+
+/* ===== POETRY GAME ===== */
+#game{padding:100px 20px;background:var(--paper-d);text-align:center}
+.game-header{margin-bottom:48px}
+.game-header h2{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:700;letter-spacing:.15em}
+.game-header p{font-size:13px;color:var(--ink-ll);margin-top:8px;letter-spacing:.08em}
+.game-area{max-width:520px;margin:0 auto;text-align:left}
+.game-question{margin-bottom:40px;padding:28px;background:var(--paper);border-radius:2px;border:1px solid rgba(44,44,44,.06);position:relative}
+.game-question::before{content:attr(data-num);position:absolute;top:-12px;left:20px;background:var(--red);color:#fff;font-size:11px;padding:2px 10px;border-radius:2px;font-family:'ZCOOL XiaoWei',serif}
+.game-prompt{font-size:17px;line-height:2.2;font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;letter-spacing:.05em;color:var(--ink);margin-bottom:16px}
+.game-blank{display:inline-block;min-width:120px;border-bottom:2px solid var(--red);margin:0 4px;padding:2px 8px;font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;font-size:17px;color:var(--red);text-align:center;background:transparent;border-top:none;border-left:none;border-right:none;outline:none;transition:border-color .3s}
+.game-blank:focus{border-bottom-color:var(--gold)}
+.game-blank.correct{color:#2d6a2e;border-bottom-color:#2d6a2e}
+.game-blank.wrong{color:var(--red);border-bottom-color:var(--red);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.game-hint{font-size:12px;color:var(--ink-ll);margin-top:8px;opacity:0;transition:opacity .3s}
+.game-hint.show{opacity:1}
+.game-feedback{margin-top:12px;font-size:13px;color:var(--ink-l);line-height:1.8;opacity:0;max-height:0;overflow:hidden;transition:all .5s}
+.game-feedback.show{opacity:1;max-height:200px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(44,44,44,.06)}
+.game-result{text-align:center;margin-top:40px;padding:32px;background:var(--paper);border:1px solid rgba(44,44,44,.06);border-radius:2px;display:none}
+.game-result.show{display:block}
+.game-result h3{font-size:18px;color:var(--red);margin-bottom:12px;letter-spacing:.1em}
+.game-result p{font-size:14px;color:var(--ink-l);line-height:2}
+
+/* ===== TIME CAPSULE ===== */
+#time-capsule{position:fixed;inset:0;z-index:9998;background:var(--paper);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--ink);transition:opacity 1s,visibility 1s} /* TODO: change display:none back to display:flex after testing */
+#time-capsule.unlocked{opacity:0;visibility:hidden;pointer-events:none}
+.tc-seal{width:72px;height:72px;border:3px solid var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--red);font-weight:700;font-family:'ZCOOL XiaoWei',serif;transform:rotate(-5deg);margin-bottom:32px;animation:seal-pulse 3s ease-in-out infinite;cursor:pointer;user-select:none}
+@keyframes seal-pulse{0%,100%{transform:rotate(-5deg) scale(1);box-shadow:none}50%{transform:rotate(-5deg) scale(1.05);box-shadow:0 0 20px rgba(184,56,59,.1)}}
+.tc-title{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:700;letter-spacing:.2em;margin-bottom:8px}
+.tc-sub{font-size:13px;color:var(--ink-ll);letter-spacing:.1em;margin-bottom:48px}
+.tc-countdown{display:flex;gap:24px;font-family:'ZCOOL XiaoWei','Noto Serif SC',serif}
+.tc-box{text-align:center}
+.tc-num{font-size:clamp(2rem,5vw,3rem);font-weight:700;line-height:1}
+.tc-lab{font-size:10px;color:var(--ink-ll);letter-spacing:3px;margin-top:8px}
+.tc-msg{margin-top:48px;font-size:13px;color:var(--ink-ll);max-width:400px;text-align:center;line-height:2}
+.tc-peek{margin-top:24px;font-size:11px;color:var(--ink-ll);opacity:.4;font-family:'ZCOOL XiaoWei',serif;letter-spacing:2px}
+
+/* ===== ANIMATIONS ===== */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .8s,transform .8s}
+.fade-in.vis{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){
+  .tl-line::before{left:20px}
+  .era{flex-direction:column!important;text-align:left!important}
+  .era-dot{left:20px!important}
+  .era-card{width:calc(100% - 48px);margin-left:48px}
+  .fs-item{gap:12px}
+  #timeline,#friendship,#letter{padding:64px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- TIME CAPSULE -->
+<div id="time-capsule">
+  <div class="tc-seal">封</div>
+  <div class="tc-title">一封未拆的诗</div>
+  <div class="tc-sub">致洛妍 · 七月二十九日解封</div>
+  <div class="tc-countdown">
+    <div class="tc-box"><div class="tc-num" id="tc-d">--</div><div class="tc-lab">日</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-h">--</div><div class="tc-lab">时</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-m">--</div><div class="tc-lab">分</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-s">--</div><div class="tc-lab">秒</div></div>
+  </div>
+  <div class="tc-msg">三千年诗卷尚未展开。<br>在你生日那天，所有诗句都会为你打开。</div>
+  <div class="tc-peek">— 有人从诗经开始，给你写了一封信 —</div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-seal">洛妍</div>
+  <div class="hero-title">诗词漫游</div>
+  <div class="hero-sub">一场跨越三千年的生日旅行</div>
+  <div class="countdown">
+    <div class="cd-box"><div class="cd-num" id="cd-d">--</div><div class="cd-lab">日</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-h">--</div><div class="cd-lab">时</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-m">--</div><div class="cd-lab">分</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-s">--</div><div class="cd-lab">秒</div></div>
+  </div>
+  <div class="scroll-hint">↓ 向下展开长卷</div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="tl-header">
+    <h2 class="fade-in">千年诗脉</h2>
+    <p class="fade-in">每一首诗里，都藏着我想对你说的话</p>
+  </div>
+  <div class="tl-line">
+
+    <!-- 先秦 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">先秦 · 约公元前600年</div>
+        <div class="era-poet">佚名</div>
+        <div class="era-title">《诗经 · 卫风 · 木瓜》</div>
+        <div class="era-verse">投我以木瓜，报之以琼琚。<br>匪报也，永以为好也。</div>
+        <div class="era-note">三千年前的人就已经懂得了：真正的友情不是等价交换，而是你给我的哪怕是一颗木瓜，我也想回报你一块美玉。这不关乎价值，关乎"我想和你永远好下去"。你在我低谷时给我的每一句鼓励，我都记着。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">墨</span></div>
+
+    <!-- 魏晋 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">魏晋 · 约公元405年</div>
+        <div class="era-poet">陶渊明</div>
+        <div class="era-title">《归园田居 · 其一》</div>
+        <div class="era-verse">少无适俗韵，性本爱丘山。<br>误落尘网中，一去三十年。<br>羁鸟恋旧林，池鱼思故渊。</div>
+        <div class="era-note">陶渊明不为五斗米折腰，辞官回家种地。你现在在家里的公司过渡、准备考教师编——你不是被困住了，你是在选择自己真正想走的路。"性本爱丘山"的人，终究会走到属于自己的山林。你就是那种人。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">韵</span></div>
+
+    <!-- 盛唐 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">盛唐 · 约公元670年</div>
+        <div class="era-poet">王勃</div>
+        <div class="era-title">《送杜少府之任蜀州》</div>
+        <div class="era-verse">海内存知己，天涯若比邻。<br>无为在歧路，儿女共沾巾。</div>
+        <div class="era-note">王勃写这首诗的时候二十五岁，送别好友去远方做官。你从福清一中到福建师大，我从福清一中到青海大学——四年里隔着几千公里，但"天涯若比邻"不是安慰人的话，是我们真正在过日子的方式。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">别</span></div>
+
+    <!-- 中唐 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">中唐 · 约公元810年</div>
+        <div class="era-poet">白居易</div>
+        <div class="era-title">《与元九书》（节选意）</div>
+        <div class="era-verse">自我从宦游，七年在长安。<br>所得惟元君，仍拟岁寒看。</div>
+        <div class="era-note">白居易和元稹的友谊持续了三十年。他们互相写诗、互相批评、互相扶持，被贬官时替对方难过。好的友谊不需要天天见面，而是在彼此需要的时候，永远在。就像我们——各自忙碌，各自生活，但从来没有断过联系。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">知</span></div>
+
+    <!-- 北宋 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">北宋 · 约公元1082年</div>
+        <div class="era-poet">苏轼</div>
+        <div class="era-title">《定风波》</div>
+        <div class="era-verse">莫听穿林打叶声，何妨吟啸且徐行。<br>竹杖芒鞋轻胜马，谁怕？<br>一蓑烟雨任平生。</div>
+        <div class="era-note">苏东坡被贬黄州那天下雨，同行的人都很狼狈，只有他拄着竹杖慢慢走，说"谁怕？一蓑烟雨任平生"。你决定考教师编的时候，身边可能有人不理解，但你心里清楚自己要什么。这份清醒和从容，像极了东坡。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">行</span></div>
+
+    <!-- 南宋 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">南宋 · 约公元1167年</div>
+        <div class="era-poet">陆游</div>
+        <div class="era-title">《游山西村》</div>
+        <div class="era-verse">莫笑农家腊酒浑，丰年留客足鸡豚。<br>山重水复疑无路，柳暗花明又一村。</div>
+        <div class="era-note">"山重水复疑无路"——你我都经历过这样的时刻。转行的时候、被质疑的时候、看不到方向的时候。但陆游告诉我们：继续走，柳暗花明就在前面。你现在就在那个"又一村"的门口，推开它就好了。</div>
+      </div>
+    </div>
+
+    <div class="ink-divider"><div class="ink-drop"></div><span class="ink-char">望</span></div>
+
+    <!-- 现代 -->
+    <div class="era fade-in">
+      <div class="era-dot"></div>
+      <div class="era-card">
+        <div class="era-dynasty">当代 · 2026年</div>
+        <div class="era-poet">写给洛妍的诗</div>
+        <div class="era-title">《致未来的语文老师》</div>
+        <div class="era-verse">你读过三千年前的木瓜，<br>也读过竹林间的吟啸。<br>你会把这些故事讲给下一个少年——<br>让他们知道，<br>文字是可以救人的，<br>朋友也是。</div>
+        <div class="era-note">这不是古人的诗，是我写给你的。你以后站在讲台上的样子，我想象得到——温柔但认真，偶尔讲着讲着会跑题，因为一首诗里值得展开的故事太多了。你会是一个很好的老师，洛妍。你已经是了。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- POETRY GAME -->
+<section id="game">
+  <div class="game-header">
+    <h2 class="fade-in">填词挑战</h2>
+    <p class="fade-in">你是汉语言文学专业的，这些难不倒你吧？</p>
+  </div>
+  <div class="game-area" id="game-area">
+
+    <div class="game-question fade-in" data-num="壹" id="q1">
+      <div class="game-prompt">
+        关关雎鸠，在河之洲。<br>
+        <input class="game-blank" data-answer="窈窕淑女" placeholder="？？？？" maxlength="6">，君子好逑。
+      </div>
+      <div class="game-hint" id="h1">提示：《诗经·关雎》，形容美好女子</div>
+      <div class="game-feedback" id="f1">窈窕淑女——三千年前的诗人就知道，最好的姑娘不是最漂亮的，是内外兼修的。你就是这样的人。</div>
+    </div>
+
+    <div class="game-question fade-in" data-num="贰" id="q2">
+      <div class="game-prompt">
+        采菊东篱下，<input class="game-blank" data-answer="悠然见南山" placeholder="？？？？？">。
+      </div>
+      <div class="game-hint" id="h2">提示：陶渊明《饮酒》，不经意间抬头</div>
+      <div class="game-feedback" id="f2">悠然见南山——不是刻意去找的，是不经意间就看见了。最好的生活也是这样，你不需要刻意追求什么，该来的自己会来。</div>
+    </div>
+
+    <div class="game-question fade-in" data-num="叁" id="q3">
+      <div class="game-prompt">
+        海内存知己，<input class="game-blank" data-answer="天涯若比邻" placeholder="？？？？？">。
+      </div>
+      <div class="game-hint" id="h3">提示：王勃《送杜少府之任蜀州》，隔着天涯也像邻居</div>
+      <div class="game-feedback" id="f3">天涯若比邻——这就是我们这四年的写照。福清到青海，几千公里，但你从来没有让我觉得远。</div>
+    </div>
+
+    <div class="game-question fade-in" data-num="肆" id="q4">
+      <div class="game-prompt">
+        莫听穿林打叶声，何妨吟啸且徐行。<br>
+        <input class="game-blank" data-answer="竹杖芒鞋轻胜马" placeholder="？？？？？？？">，谁怕？一蓑烟雨任平生。
+      </div>
+      <div class="game-hint" id="h4">提示：苏轼《定风波》，拄着竹杖穿着草鞋</div>
+      <div class="game-feedback" id="f4">竹杖芒鞋轻胜马——别人骑马赶路，苏东坡拄着竹杖慢慢走，反而更轻快。你选择走自己的路，比跟风的人走得稳。</div>
+    </div>
+
+    <div class="game-question fade-in" data-num="伍" id="q5">
+      <div class="game-prompt">
+        山重水复疑无路，<input class="game-blank" data-answer="柳暗花明又一村" placeholder="？？？？？？？">。
+      </div>
+      <div class="game-hint" id="h5">提示：陆游《游山西村》，绝处逢生的名句</div>
+      <div class="game-feedback" id="f5">柳暗花明又一村——你现在的每一步，都在走向那个"又一村"。快了，推开门就是。</div>
+    </div>
+
+  </div>
+  <div class="game-result" id="game-result">
+    <h3>全部答对</h3>
+    <p>你看，三千年前的诗你全都记得。<br>以后站在讲台上的时候，你的学生一定会觉得——<br>这个语文老师，是真的懂诗、也懂生活的人。<br><br>生日快乐，洛妍。</p>
+  </div>
+</section>
+
+<!-- FRIENDSHIP -->
+<section id="friendship">
+  <div class="fs-header">
+    <h2 class="fade-in">四年 · 不断线</h2>
+    <p class="fade-in">我们共同的时间线</p>
+  </div>
+  <div class="fs-timeline">
+    <div class="fs-item fade-in">
+      <div class="fs-year">2019</div>
+      <div class="fs-dot"></div>
+      <div class="fs-text"><strong>福清一中</strong>，我们在这里相识。那时候不知道以后会隔着几千公里，也不知道你会读汉语言文学、我会去学动物医学。但有些事情不需要理由，认识了就认识了。</div>
+    </div>
+    <div class="fs-item fade-in">
+      <div class="fs-year">2022</div>
+      <div class="fs-dot"></div>
+      <div class="fs-text">高考结束，你去了<strong>福建师范大学</strong>，我去了<strong>青海大学</strong>。一个在最东南，一个在最西北。别人说大学以后朋友就散了，我们偏不信。</div>
+    </div>
+    <div class="fs-item fade-in">
+      <div class="fs-year">2022–25</div>
+      <div class="fs-dot"></div>
+      <div class="fs-text">四年里，我们分享生活里的点点滴滴。开心的、难过的、无聊的、深夜emo的——你从来没有让我觉得"算了不说了"。你一直在听。</div>
+    </div>
+    <div class="fs-item fade-in">
+      <div class="fs-year">2026</div>
+      <div class="fs-dot"></div>
+      <div class="fs-text">我决定转行的时候，连家里人都质疑我。<strong>只有你，从头到尾都在鼓励我。</strong>你说"你做什么都可以做好"。这句话我到现在还记得。洛妍，谢谢你。</div>
+    </div>
+    <div class="fs-item fade-in">
+      <div class="fs-year">现在</div>
+      <div class="fs-dot" style="background:var(--red)"></div>
+      <div class="fs-text">你在准备教师编，我在新的领域重新开始。我们都在朝着自己想走的路走。<strong>但不管走多远，回头的时候一定在。</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- LETTER -->
+<section id="letter">
+  <div class="letter-wrap fade-in">
+    <p>洛妍：</p>
+    <p>你学的是汉语言文学，你比谁都懂文字的力量。所以我只能用文字送你一个生日礼物——虽然它不是手写的，但每一个字都是认真写的。</p>
+    <p>从《诗经》到苏轼，从陶渊明到陆游，三千年里那些最好的诗人，都在说同一件事：选择你自己想走的路，珍惜那些真正在意你的人，在逆境中保持从容。</p>
+    <p>你已经在做这些事了。</p>
+    <p>你在过渡期的公司里踏踏实实地工作，你在一遍一遍地复习准备考试，你在我需要的时候永远都在。你不需要成为任何人的期待，因为你已经是你自己最好的样子了。</p>
+    <p>生日快乐，洛妍。愿你以后教的学生，都能因为你而爱上语文。</p>
+    <div class="letter-sign">—— 你的高中同学、四年不断线的朋友</div>
+    <div style="text-align:right;margin-top:8px"><span class="letter-seal">知己</span></div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:48px 20px;font-size:11px;color:var(--ink-ll);letter-spacing:2px">
+  三千年诗脉 · 四年友情 · 一份生日礼物<br>
+  <span style="font-size:10px;opacity:.5">2026</span>
+</footer>
+
+<script>
+/* ===== COUNTDOWN ===== */
+const TARGET = new Date('2026-07-29T00:00:00+08:00').getTime();
+function tick(){
+  const diff = Math.max(0, TARGET - Date.now());
+  const d = Math.floor(diff/864e5), h = Math.floor(diff%864e5/36e5);
+  const m = Math.floor(diff%36e5/6e4), s = Math.floor(diff%6e4/1e3);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+/* ===== SCROLL ANIMATIONS ===== */
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+/* ===== INK WASH DIVIDERS ===== */
+const inkObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('active');
+      inkObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+document.querySelectorAll('.ink-divider').forEach(el=>inkObs.observe(el));
+
+/* ===== POETRY GAME ===== */
+(function(){
+  let correct = 0;
+  const total = document.querySelectorAll('.game-blank').length;
+  document.querySelectorAll('.game-blank').forEach(input=>{
+    let attempts = 0;
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        const answer = this.dataset.answer;
+        const val = this.value.trim();
+        if(val === answer){
+          this.classList.remove('wrong');
+          this.classList.add('correct');
+          this.disabled = true;
+          const q = this.closest('.game-question');
+          const fb = q.querySelector('.game-feedback');
+          if(fb) fb.classList.add('show');
+          correct++;
+          if(correct === total){
+            setTimeout(()=>{
+              document.getElementById('game-result').classList.add('show');
+              document.getElementById('game-result').scrollIntoView({behavior:'smooth',block:'center'});
+            }, 800);
+          }
+        } else {
+          this.classList.add('wrong');
+          attempts++;
+          setTimeout(()=>this.classList.remove('wrong'), 500);
+          if(attempts >= 2){
+            const q = this.closest('.game-question');
+            const hint = q.querySelector('.game-hint');
+            if(hint) hint.classList.add('show');
+          }
+        }
+      }
+    });
+  });
+})();
+
+/* ===== TIME CAPSULE ===== */
+(function(){
+  const tc = document.getElementById('time-capsule');
+  const target = new Date('2026-07-29T00:00:00+08:00').getTime();
+  function tcTick(){
+    const now = Date.now(), diff = target - now;
+    if(diff <= 0){
+      tc.classList.add('unlocked');
+      return;
+    }
+    const d = Math.floor(diff/864e5), h = Math.floor(diff%864e5/36e5);
+    const m = Math.floor(diff%36e5/6e4), s = Math.floor(diff%6e4/1e3);
+    document.getElementById('tc-d').textContent = String(d).padStart(2,'0');
+    document.getElementById('tc-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('tc-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('tc-s').textContent = String(s).padStart(2,'0');
+  }
+  tcTick(); setInterval(tcTick, 1000);
+  if(new URLSearchParams(location.search).get('unlock')==='true'){
+    tc.classList.add('unlocked');
+  }
+  // Developer shortcut: Ctrl+Shift+U to bypass time capsule
+  document.addEventListener('keydown', function(e){
+    if(e.ctrlKey && e.shiftKey && e.key === 'U'){
+      tc.classList.add('unlocked');
+    }
+  });
+  // Click the seal to unlock (for preview/testing)
+  const seal = tc.querySelector('.tc-seal') || tc.querySelector('.tc-lock-icon');
+  if(seal) seal.addEventListener('click', function(){
+    tc.classList.add('unlocked');
+  });
+})();
+</script>
+</body>
+</html>
