@@ -31,8 +31,7 @@
 body{font-family:'Noto Serif SC',Georgia,serif;color:var(--txt);background:var(--bg);overflow-x:hidden;line-height:1.8}
 
 /* ===== PARTICLE OPENING ===== */
-#particle-overlay{position:fixed;inset:0;z-index:9999;background:#0a0e17;display:none;align-items:center;justify-content:center;transition:opacity .8s ease-out} /* TODO: change display:none back to display:flex after testing */
-#particle-overlay.fade-out{opacity:0;pointer-events:none}
+#particle-overlay{position:fixed;inset:0;z-index:9999;background:#0a0e17;display:none;align-items:center;justify-content:center;transition:opacity .8s ease-out}#particle-overlay.fade-out{opacity:0;pointer-events:none}
 #particle-canvas{position:absolute;inset:0;width:100%;height:100%}
 .particle-title{position:relative;z-index:1;text-align:center;opacity:0;transform:translateY(20px) scale(0.95);transition:opacity .8s,transform .8s}
 .particle-title.show{opacity:1;transform:translateY(0) scale(1)}
@@ -157,8 +156,7 @@ section{padding:100px 24px}
 .poem-back-close:hover{opacity:1}
 
 /* ===== TIME CAPSULE ===== */
-#time-capsule{position:fixed;inset:0;z-index:9998;background:var(--pri);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;transition:opacity .8s,visibility .8s} /* TODO: change display:none back to display:flex after testing */
-#time-capsule.unlocked{opacity:0;visibility:hidden;pointer-events:none}
+#time-capsule{position:fixed;inset:0;z-index:9998;background:var(--pri);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;transition:opacity .8s,visibility .8s}#time-capsule.unlocked{opacity:0;visibility:hidden;pointer-events:none}
 .tc-lock-icon{font-size:48px;margin-bottom:24px;opacity:.6;animation:pulse-lock 2s ease-in-out infinite;cursor:pointer;user-select:none}
 @keyframes pulse-lock{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.1);opacity:.8}}
 .tc-title{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:700;letter-spacing:.15em;margin-bottom:12px}
