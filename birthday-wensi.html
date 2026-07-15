@@ -928,6 +928,11 @@ function toggleLayer(el){ el.classList.toggle('expanded'); }
 
 /* ===== THREE.JS 3D SPECIMEN ===== */
 (function(){
+  if(typeof THREE === 'undefined'){
+    var box = document.getElementById('three-box');
+    if(box) box.innerHTML = '<p style="text-align:center;padding:60px 20px;color:var(--txt2);font-size:14px">3D 模型加载中，请刷新页面重试</p>';
+    return;
+  }
   const box = document.getElementById('three-box');
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(45, box.clientWidth/box.clientHeight, 0.1, 100);
@@ -1374,6 +1379,11 @@ function closeGlobe(){
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeGlobe(); });
 
 function initGlobeScene(containerId, interactive){
+  if(typeof THREE === 'undefined'){
+    var box = document.getElementById(containerId);
+    if(box) box.innerHTML = '<p style="text-align:center;padding:40px;color:var(--txt2);font-size:13px">3D 地球加载失败</p>';
+    return;
+  }
   const box = document.getElementById(containerId);
   const W = box.clientWidth, H = box.clientHeight;
   const scene = new THREE.Scene();
