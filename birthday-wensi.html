@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Wensi · 7.24</title>
+<script>
+/* CDN-optimized font loader: Chinese mirror → Google Fonts → system fallback */
+(function(){
+  var href='https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap';
+  var fb='https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap';
+  var link=document.createElement('link');
+  link.rel='stylesheet';link.href=href;
+  var timer=setTimeout(function(){link.remove()},5000);
+  link.onload=function(){clearTimeout(timer)};
+  link.onerror=function(){
+    clearTimeout(timer);link.remove();
+    var f=document.createElement('link');
+    f.rel='stylesheet';f.href=fb;
+    document.head.appendChild(f);
+  };
+  document.head.appendChild(link);
+})();
+</script>
+<style>
+:root{
+  --pri:#1a365d;--pri-l:#2c5282;--bg:#fff;--card:#f7fafc;
+  --txt:#1a202c;--txt2:#718096;--bdr:#e2e8f0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',Georgia,serif;color:var(--txt);background:var(--bg);overflow-x:hidden;line-height:1.8}
+
+/* ===== PARTICLE OPENING ===== */
+#particle-overlay{position:fixed;inset:0;z-index:9999;background:#0a0e17;display:none;align-items:center;justify-content:center;transition:opacity .8s ease-out} /* TODO: change display:none back to display:flex after testing */
+#particle-overlay.fade-out{opacity:0;pointer-events:none}
+#particle-canvas{position:absolute;inset:0;width:100%;height:100%}
+.particle-title{position:relative;z-index:1;text-align:center;opacity:0;transform:translateY(20px) scale(0.95);transition:opacity .8s,transform .8s}
+.particle-title.show{opacity:1;transform:translateY(0) scale(1)}
+.particle-title h1{font-size:clamp(2.5rem,7vw,5rem);color:#fff;font-weight:700;letter-spacing:.3em;text-shadow:0 0 40px rgba(49,130,206,.5),0 0 80px rgba(56,178,172,.3),0 0 120px rgba(49,130,206,.15)}
+.particle-title p{font-family:'JetBrains Mono',monospace;font-size:clamp(.7rem,1.5vw,.9rem);color:rgba(255,255,255,.4);letter-spacing:.2em;margin-top:16px}
+.skip-btn{position:absolute;bottom:40px;right:40px;z-index:2;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.4);padding:8px 20px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;transition:.3s}
+.skip-btn:hover{border-color:rgba(255,255,255,.5);color:rgba(255,255,255,.7)}
+
+/* ===== NAV DOTS ===== */
+.nav-dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:12px}
+.nav-dots a{width:10px;height:10px;border-radius:50%;background:var(--bdr);transition:.3s}
+.nav-dots a.active{background:var(--pri);transform:scale(1.3)}
+
+/* ===== HERO / COUNTDOWN ===== */
+#hero{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--pri);color:#fff;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 70%,rgba(49,130,206,.15),transparent 60%),radial-gradient(ellipse at 70% 30%,rgba(56,178,172,.1),transparent 50%)}
+.hero-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.5;margin-bottom:24px}
+.hero-title{font-size:clamp(2rem,5vw,3.6rem);font-weight:700;letter-spacing:.15em;margin-bottom:12px;text-shadow:0 2px 30px rgba(0,0,0,.3)}
+.hero-sub{font-size:clamp(.9rem,2vw,1.1rem);opacity:.55;font-family:'JetBrains Mono',monospace;margin-bottom:56px;letter-spacing:.08em}
+.countdown{display:flex;gap:clamp(12px,3vw,32px)}
+.cd-box{text-align:center;min-width:clamp(60px,10vw,100px)}
+.cd-num{font-family:'JetBrains Mono',monospace;font-size:clamp(2rem,6vw,4rem);font-weight:700;line-height:1}
+.cd-lab{font-size:10px;text-transform:uppercase;letter-spacing:2px;opacity:.4;margin-top:8px}
+.scroll-hint{position:absolute;bottom:32px;font-size:12px;opacity:.3;animation:float 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ===== SECTIONS ===== */
+section{padding:100px 24px}
+.sec-title{font-size:clamp(1.4rem,3vw,1.8rem);color:var(--pri);margin-bottom:8px;font-weight:700}
+.sec-sub{font-size:14px;color:var(--txt2);font-family:'JetBrains Mono',monospace;margin-bottom:48px}
+.container{max-width:900px;margin:0 auto}
+
+/* ===== SOIL PROFILE ===== */
+.soil-grid{display:grid;grid-template-columns:80px 1fr;gap:0;border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+.soil-depth{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2);border-bottom:1px solid var(--bdr);background:#f1f5f9}
+.soil-layer{padding:24px 28px;cursor:pointer;border-bottom:1px solid var(--bdr);transition:all .3s;position:relative;overflow:hidden}
+.soil-layer:last-child,.soil-depth:last-child{border-bottom:none}
+.soil-layer::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.soil-layer:hover{background:rgba(26,54,93,.03)}
+.soil-layer.expanded{background:rgba(26,54,93,.04)}
+.layer-head{display:flex;align-items:center;gap:12px}
+.layer-name{font-weight:600;font-size:15px;color:var(--pri)}
+.layer-type{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2);background:var(--card);padding:2px 8px;border-radius:3px}
+.layer-params{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2);margin-top:6px;line-height:1.6}
+.layer-msg{max-height:0;overflow:hidden;transition:max-height .5s ease,margin .3s;margin-top:0;font-size:14px;line-height:2;color:#2d3748}
+.soil-layer.expanded .layer-msg{max-height:300px;margin-top:16px}
+.layer-hint{font-size:11px;color:var(--bdr);position:absolute;right:16px;top:50%;transform:translateY(-50%);transition:.3s}
+.soil-layer:hover .layer-hint{color:var(--txt2)}
+.soil-layer.expanded .layer-hint{opacity:0}
+
+/* ===== 3D SPECIMEN ===== */
+#specimen{background:var(--pri);color:#fff;text-align:center}
+#specimen .sec-title{color:rgba(255,255,255,.9)}
+#specimen .sec-sub{color:rgba(255,255,255,.4)}
+#three-box{width:100%;max-width:500px;height:420px;margin:0 auto;border-radius:12px;overflow:hidden;position:relative}
+#three-box canvas{display:block}
+.specimen-legend{display:flex;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap}
+.specimen-legend span{font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.5}
+
+/* ===== MAP ===== */
+#map-sec{background:#f8fafb}
+.map-wrap{position:relative;max-width:700px;margin:0 auto;background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.map-svg-area{position:relative;width:100%;height:480px;background:linear-gradient(135deg,#e8f0f8,#dce8f4);border-radius:8px;overflow:hidden;cursor:crosshair;box-shadow:inset 0 0 60px rgba(26,54,93,.08)}
+.map-svg-area::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");opacity:.5;pointer-events:none;z-index:1}
+.map-cities circle{transition:all .4s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.map-cities circle:hover{r:6;filter:drop-shadow(0 0 8px rgba(184,56,59,.6))}
+.map-cities text{pointer-events:none;transition:all .4s}
+.map-cities circle:hover+text{opacity:1!important;font-weight:bold;transform:scale(1.1)}
+.map-landmarks{pointer-events:none}
+.map-landmarks text{font-family:'Noto Serif SC',serif;font-size:7px;fill:#1a365d;opacity:.5}
+.map-landmarks g{transition:opacity .5s}
+.map-svg-area:hover .map-landmarks{opacity:1}
+.map-streets{pointer-events:none;opacity:.12;transition:opacity .6s}
+.map-svg-area:hover .map-streets{opacity:.25}
+.map-title-cartouche{pointer-events:none}
+.fuqing-callout rect{transition:all .3s}
+.fuqing-callout:hover rect{fill:#fff5f5;stroke-width:1.5}
+.map-pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;z-index:2}
+.map-pin svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}
+.map-pin-label{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--pri);color:#fff;padding:2px 8px;border-radius:3px;opacity:0;transition:.2s;pointer-events:none}
+.map-pin:hover .map-pin-label{opacity:1}
+.map-pin.custom .map-pin-label{background:#c53030}
+.add-pin-form{display:none;margin-top:16px;padding:16px;background:var(--card);border-radius:8px;border:1px solid var(--bdr)}
+.add-pin-form.show{display:block}
+.add-pin-form input{width:100%;padding:8px 12px;border:1px solid var(--bdr);border-radius:4px;font-family:'Noto Serif SC',serif;font-size:14px;margin-bottom:8px}
+.add-pin-form button{background:var(--pri);color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-family:'Noto Serif SC',serif}
+.map-hint{font-size:12px;color:var(--txt2);text-align:center;margin-top:12px}
+
+/* ===== FORMULAS ===== */
+.formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.formula-card{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:28px;transition:all .3s}
+.formula-card:hover{border-color:var(--pri-l);box-shadow:0 4px 12px rgba(26,54,93,.08)}
+.formula-expr{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--pri);margin-bottom:12px;font-weight:600}
+.formula-note{font-size:13px;color:var(--txt2);line-height:1.8}
+
+/* ===== LETTER ===== */
+#letter{background:linear-gradient(180deg,#fff,#f7fafc);text-align:center}
+.letter-body{max-width:640px;margin:0 auto;font-size:16px;line-height:2.2;text-align:left;color:#2d3748}
+.letter-body p{margin-bottom:20px}
+.letter-sign{text-align:right;font-weight:600;color:var(--pri);margin-top:40px}
+
+/* ===== POETRY COLLECTION ===== */
+#poetry{background:var(--pri);color:#fff;overflow:hidden}
+#poetry .sec-title{color:rgba(255,255,255,.9)}
+#poetry .sec-sub{color:rgba(255,255,255,.4)}
+.poem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.poem-card{perspective:800px;height:320px;cursor:pointer}
+.poem-card-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.poem-card.flipped .poem-card-inner{transform:rotateY(180deg)}
+.poem-front,.poem-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:8px;padding:28px;display:flex;flex-direction:column}
+.poem-front{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);justify-content:space-between;transition:background .3s}
+.poem-card:hover .poem-front{background:rgba(255,255,255,.1)}
+.poem-front-top{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.poem-title{font-size:20px;font-weight:700;letter-spacing:.1em;margin-bottom:8px}
+.poem-author{font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.4;letter-spacing:.15em}
+.poem-date{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.3;margin-top:12px}
+.poem-hint{font-size:11px;opacity:.25;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.poem-back{background:rgba(255,255,255,.95);color:#1a202c;transform:rotateY(180deg);overflow-y:auto;font-size:13px;line-height:2}
+.poem-back-title{font-size:14px;font-weight:700;color:var(--pri);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+.poem-back-text{white-space:pre-line;font-family:'Noto Serif SC',serif}
+.poem-back-close{position:absolute;top:12px;right:16px;font-size:18px;color:var(--txt2);cursor:pointer;opacity:.5;transition:.2s;background:none;border:none;font-family:inherit}
+.poem-back-close:hover{opacity:1}
+
+/* ===== TIME CAPSULE ===== */
+#time-capsule{position:fixed;inset:0;z-index:9998;background:var(--pri);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;transition:opacity .8s,visibility .8s} /* TODO: change display:none back to display:flex after testing */
+#time-capsule.unlocked{opacity:0;visibility:hidden;pointer-events:none}
+.tc-lock-icon{font-size:48px;margin-bottom:24px;opacity:.6;animation:pulse-lock 2s ease-in-out infinite;cursor:pointer;user-select:none}
+@keyframes pulse-lock{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.1);opacity:.8}}
+.tc-title{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:700;letter-spacing:.15em;margin-bottom:12px}
+.tc-sub{font-family:'JetBrains Mono',monospace;font-size:13px;opacity:.4;letter-spacing:.1em;margin-bottom:40px}
+.tc-countdown{display:flex;gap:20px}
+.tc-box{text-align:center}
+.tc-num{font-family:'JetBrains Mono',monospace;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1}
+.tc-lab{font-size:10px;text-transform:uppercase;letter-spacing:2px;opacity:.35;margin-top:8px}
+.tc-msg{margin-top:48px;font-size:13px;opacity:.3;max-width:400px;text-align:center;line-height:1.8}
+.tc-peek{margin-top:32px;font-size:11px;opacity:.2;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+
+/* ===== GLOBE ===== */
+#globe-sec{padding:80px 24px;text-align:center}
+#globe-widget{position:relative;width:380px;height:380px;margin:32px auto;border-radius:50%;cursor:pointer;overflow:hidden;background:radial-gradient(circle,#0a0e17 60%,#060a12 100%);box-shadow:0 0 0 3px rgba(26,54,93,.15),0 0 60px rgba(26,54,93,.2),0 0 120px rgba(26,54,93,.08);transition:transform .4s,box-shadow .4s}
+#globe-widget:hover{transform:scale(1.03);box-shadow:0 0 0 3px rgba(26,54,93,.25),0 0 80px rgba(26,54,93,.3),0 0 160px rgba(26,54,93,.12)}
+#globe-widget canvas{width:100%!important;height:100%!important;border-radius:50%}
+.globe-hint{font-size:13px;color:var(--txt2);margin-top:16px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;opacity:.6}
+.globe-city-tags{display:flex;gap:16px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.globe-city-tag{font-size:11px;padding:4px 12px;border-radius:20px;background:var(--card);border:1px solid var(--bdr);color:var(--txt2);font-family:'JetBrains Mono',monospace}
+.globe-city-tag .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+#globe-modal{position:fixed;inset:0;z-index:9997;background:rgba(10,14,23,.95);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .5s}
+#globe-modal.open{display:flex;opacity:1}
+#globe-modal-box{position:relative;width:92vw;height:88vh;max-width:1100px}
+#globe-modal-box canvas{width:100%!important;height:100%!important;border-radius:12px}
+#globe-close{position:absolute;top:16px;right:16px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.3s}
+#globe-close:hover{background:rgba(255,255,255,.2)}
+.globe-modal-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.3);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.globe-label-3d{position:absolute;pointer-events:none;color:#fff;font-size:11px;font-family:'JetBrains Mono',monospace;text-shadow:0 0 8px rgba(0,0,0,.8);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 8px;background:rgba(0,0,0,.4);border-radius:4px}
+
+/* ===== ANIMATIONS ===== */
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.fade-in.vis{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  section{padding:64px 16px}
+  .soil-grid{grid-template-columns:1fr}
+  .soil-depth{display:none}
+  .nav-dots{display:none}
+  .countdown{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- PARTICLE OPENING -->
+<div id="particle-overlay">
+  <canvas id="particle-canvas"></canvas>
+  <div class="particle-title" id="particle-title">
+    <h1>For Wensi</h1>
+    <p>距离七月的地层，还有一段时间</p>
+  </div>
+  <button class="skip-btn" onclick="skipIntro()">SKIP →</button>
+</div>
+<script>
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  // Geological strata colors (bottom=bedrock to top=fill)
+  const LAYERS = [
+    { color: [74,85,104],  y: 0.82 },
+    { color: [107,124,94], y: 0.68 },
+    { color: [139,157,195], y: 0.55 },
+    { color: [212,167,106], y: 0.42 },
+    { color: [160,132,92],  y: 0.30 },
+    { color: [196,168,130], y: 0.17 },
+  ];
+
+  const NUM = 500;
+  const cx = W/2, cy = H/2;
+  const particles = [];
+
+  for(let i = 0; i < NUM; i++){
+    const layer = LAYERS[Math.floor(Math.random()*LAYERS.length)];
+    const angle = Math.random()*Math.PI*2;
+    const burst = 4 + Math.random()*10;
+    particles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle)*burst*(0.6+Math.random()*0.8),
+      vy: Math.sin(angle)*burst*(0.6+Math.random()*0.8),
+      tx: Math.random()*W,
+      ty: H*(1-layer.y) + (Math.random()-0.5)*H*0.07,
+      size: 1.2 + Math.random()*2.5,
+      rgb: layer.color,
+      trail: [],
+      trailMax: 5 + Math.floor(Math.random()*4),
+      settled: false,
+      settledT: 0,
+      seed: Math.random()*100
+    });
+  }
+
+  let time = 0;
+  let phase = 'burst'; // burst -> settling -> title -> fadeout
+  let shockwave = null;
+  let titleRevealed = false;
+
+  function rgba(c, a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')'; }
+
+  function animate(){
+    time += 0.016;
+
+    // Motion-blur trail effect: semi-transparent black overlay instead of clear
+    ctx.fillStyle = 'rgba(10,12,20,0.18)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle geological grid (fades in)
+    const gridAlpha = Math.min(0.04, time*0.015);
+    ctx.strokeStyle = 'rgba(255,255,255,'+gridAlpha+')';
+    ctx.lineWidth = 0.5;
+    for(let y = 0; y < H; y += 50){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    let settledCount = 0;
+
+    // Phase 1: Burst (0-0.8s) — free flight outward from center
+    if(phase === 'burst' && time > 0.8) phase = 'settling';
+
+    // Phase 2→3: Settling → Title
+    if(phase === 'settling' && settledCount > NUM*0.82 && time > 1.6){
+      phase = 'title';
+      // Shockwave from center
+      shockwave = { x: cx, y: cy, r: 0, maxR: Math.max(W,H)*0.8, alpha: 0.6 };
+    }
+
+    particles.forEach(p => {
+      // Store trail position
+      p.trail.push({x:p.x, y:p.y});
+      if(p.trail.length > p.trailMax) p.trail.shift();
+
+      if(phase === 'burst'){
+        // Free flight with gravity and drag
+        p.vy += 0.06; // slight gravity
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.x += p.vx;
+        p.y += p.vy;
+      } else if(phase === 'settling' || phase === 'title'){
+        if(!p.settled){
+          // Spring toward target + organic wobble
+          const dx = p.tx - p.x, dy = p.ty - p.y;
+          const wobble = Math.sin(time*3.5 + p.seed)*0.8;
+          p.vx = p.vx*0.91 + dx*0.045 + wobble*0.15;
+          p.vy = p.vy*0.91 + dy*0.045;
+          p.x += p.vx;
+          p.y += p.vy;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 3){ p.settled = true; p.settledT = time; }
+        } else {
+          settledCount++;
+          // Gentle breathing drift when settled
+          p.x = p.tx + Math.sin(time*0.8 + p.seed)*1.5;
+          p.y = p.ty + Math.cos(time*0.6 + p.seed*1.3)*1;
+        }
+      }
+
+      // Draw trail
+      const tLen = p.trail.length;
+      if(tLen > 1){
+        for(let j = 0; j < tLen-1; j++){
+          const t = j/tLen;
+          const a = t * (p.settled ? 0.08 : 0.25);
+          ctx.beginPath();
+          ctx.arc(p.trail[j].x, p.trail[j].y, p.size*t*0.7, 0, Math.PI*2);
+          ctx.fillStyle = rgba(p.rgb, a);
+          ctx.fill();
+        }
+      }
+
+      // Draw particle
+      const baseAlpha = p.settled ? 0.75 : 0.5 + Math.sin(time*2.5+p.seed)*0.15;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = rgba(p.rgb, baseAlpha);
+      ctx.fill();
+
+      // Outer glow (only when moving fast)
+      if(!p.settled){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2);
+        ctx.fillStyle = rgba(p.rgb, 0.06);
+        ctx.fill();
+      }
+    });
+
+    // Horizontal light pulses along settled layers
+    if(phase === 'settling' || phase === 'title'){
+      LAYERS.forEach((l, idx) => {
+        const ly = H*(1-l.y);
+        const pulseAge = time*1.2 - idx*0.25;
+        if(pulseAge > 0 && pulseAge < 2.5){
+          const px = (pulseAge/2.5)*W;
+          const fade = 1 - pulseAge/2.5;
+          const grad = ctx.createLinearGradient(px-80,0,px+80,0);
+          grad.addColorStop(0, rgba(l.color, 0));
+          grad.addColorStop(0.5, rgba(l.color, 0.35*fade));
+          grad.addColorStop(1, rgba(l.color, 0));
+          ctx.fillStyle = grad;
+          ctx.fillRect(px-80, ly-8, 160, 16);
+        }
+      });
+    }
+
+    // Layer labels (fade in when settled)
+    if(settledCount > NUM*0.6){
+      const labelAlpha = Math.min(0.18, (settledCount/NUM - 0.6)*0.9);
+      ctx.font = '10px "JetBrains Mono", monospace';
+      LAYERS.forEach((l,i) => {
+        const ly = H*(1-l.y);
+        ctx.fillStyle = 'rgba(255,255,255,'+labelAlpha+')';
+        ctx.fillText('Layer '+(i+1), 24, ly+3);
+        ctx.strokeStyle = 'rgba(255,255,255,'+(labelAlpha*0.3)+')';
+        ctx.beginPath(); ctx.moveTo(72,ly); ctx.lineTo(W-24,ly); ctx.stroke();
+      });
+    }
+
+    // Shockwave ripple
+    if(shockwave){
+      shockwave.r += 12;
+      shockwave.alpha *= 0.965;
+      if(shockwave.alpha > 0.01){
+        ctx.beginPath();
+        ctx.arc(shockwave.x, shockwave.y, shockwave.r, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(200,220,255,'+shockwave.alpha+')';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        // Second ring (delayed)
+        if(shockwave.r > 60){
+          ctx.beginPath();
+          ctx.arc(shockwave.x, shockwave.y, shockwave.r-60, 0, Math.PI*2);
+          ctx.strokeStyle = 'rgba(200,220,255,'+(shockwave.alpha*0.4)+')';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+      // Reveal title when shockwave is big enough
+      if(!titleRevealed && shockwave.r > Math.min(W,H)*0.25){
+        titleRevealed = true;
+        document.getElementById('particle-title').classList.add('show');
+      }
+    }
+
+    // Fadeout
+    if(phase === 'title' && time > 4.2){
+      phase = 'fadeout';
+      document.getElementById('particle-overlay').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('particle-overlay').style.display = 'none';
+      }, 800);
+    }
+
+    if(phase !== 'done') requestAnimationFrame(animate);
+  }
+
+  // Initial black fill
+  ctx.fillStyle = 'rgb(10,12,20)';
+  ctx.fillRect(0,0,W,H);
+  animate();
+
+  window.skipIntro = function(){
+    phase = 'fadeout';
+    document.getElementById('particle-overlay').classList.add('fade-out');
+    setTimeout(() => {
+      document.getElementById('particle-overlay').style.display = 'none';
+    }, 800);
+  };
+})();
+</script>
+
+<!-- TIME CAPSULE -->
+<div id="time-capsule">
+  <div class="tc-lock-icon">🔒</div>
+  <div class="tc-title">这是一份时间胶囊</div>
+  <div class="tc-sub">A Time Capsule for Wensi · 7.24</div>
+  <div class="tc-countdown">
+    <div class="tc-box"><div class="tc-num" id="tc-d">--</div><div class="tc-lab">Days</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-h">--</div><div class="tc-lab">Hours</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-m">--</div><div class="tc-lab">Min</div></div>
+    <div class="tc-box"><div class="tc-num" id="tc-s">--</div><div class="tc-lab">Sec</div></div>
+  </div>
+  <div class="tc-msg">在你生日到来之前，这份礼物被锁在时间里。<br>倒计时归零的那一刻，一切都会为你打开。</div>
+  <div class="tc-peek">— 有人为你写了代码、地层、和诗 —</div>
+</div>
+
+<!-- NAV DOTS -->
+<div class="nav-dots">
+  <a href="#hero"></a><a href="#soil"></a><a href="#specimen"></a><a href="#map-sec"></a><a href="#globe-sec"></a><a href="#formulas"></a><a href="#letter"></a><a href="#poetry"></a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-label">Geotechnical Engineering · Birthday Edition</div>
+  <div class="hero-title">For Wensi</div>
+  <div class="hero-sub">距离七月的地层，还有</div>
+  <div class="countdown">
+    <div class="cd-box"><div class="cd-num" id="cd-d">--</div><div class="cd-lab">Days</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-h">--</div><div class="cd-lab">Hours</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-m">--</div><div class="cd-lab">Min</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-s">--</div><div class="cd-lab">Sec</div></div>
+  </div>
+  <div class="scroll-hint">↓ 往下探索</div>
+</section>
+
+<!-- SOIL PROFILE -->
+<section id="soil">
+  <div class="container">
+    <div class="sec-title fade-in">钻孔柱状图 · Borehole Log</div>
+    <div class="sec-sub fade-in">每一层地层，都是你走过的路（点击展开）</div>
+    <div class="soil-grid fade-in" id="soil-grid"></div>
+  </div>
+</section>
+
+<!-- 3D SPECIMEN -->
+<section id="specimen">
+  <div class="container">
+    <div class="sec-title fade-in">标本 No.0724</div>
+    <div class="sec-sub fade-in">拖拽旋转 · 一块只属于你的岩石</div>
+    <div id="three-box" class="fade-in"></div>
+    <div class="specimen-legend fade-in">
+      <span>φ' = 38°</span><span>c' = 15 kPa</span><span>ρ = 2.72 g/cm³</span><span>Specimen: WENSITE</span>
+    </div>
+  </div>
+</section>
+
+<!-- UK MAP -->
+<section id="map-sec">
+  <div class="container">
+    <div class="sec-title fade-in">你的地图 · Your Coordinates</div>
+    <div class="sec-sub fade-in">从福清到英国，点击地图添加你去过的地方</div>
+    <div class="map-wrap fade-in">
+      <div class="map-svg-area" id="map-area">
+        <svg viewBox="0 0 400 550" style="position:absolute;inset:0;width:100%;height:100%" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="coast-glow">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="watercolor">
+              <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise"/>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/>
+            </filter>
+            <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e8f0f8"/>
+              <stop offset="100%" stop-color="#dce8f4"/>
+            </linearGradient>
+            <pattern id="waves" width="60" height="20" patternUnits="userSpaceOnUse">
+              <path d="M0,10 Q15,5 30,10 T60,10" stroke="#b8c9d9" stroke-width="0.4" fill="none" opacity=".3"/>
+            </pattern>
+            <radialGradient id="landmark-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c53030" stop-opacity=".3"/>
+              <stop offset="100%" stop-color="#c53030" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- Sea background with wave pattern -->
+          <rect x="0" y="0" width="400" height="550" fill="url(#sea)" rx="8"/>
+          <rect x="0" y="0" width="400" height="550" fill="url(#waves)" opacity=".4"/>
+          <!-- Decorative wave lines -->
+          <path d="M30,460 Q50,455 70,460 T110,460 T150,460 T190,460 T230,460 T270,460 T310,460 T350,460 T390,460" stroke="#c5d8e8" stroke-width="0.6" fill="none" opacity=".5"/>
+          <path d="M10,475 Q30,470 50,475 T90,475 T130,475 T170,475 T210,475 T250,475 T290,475 T330,475 T370,475" stroke="#c5d8e8" stroke-width="0.6" fill="none" opacity=".4"/>
+          <path d="M20,490 Q40,485 60,490 T100,490 T140,490 T180,490 T220,490 T260,490 T300,490 T340,490 T380,490" stroke="#c5d8e8" stroke-width="0.6" fill="none" opacity=".3"/>
+          <!-- Compass rose -->
+          <g transform="translate(42,510)" opacity=".35">
+            <line x1="0" y1="-14" x2="0" y2="14" stroke="#1a365d" stroke-width="1"/>
+            <line x1="-14" y1="0" x2="14" y2="0" stroke="#1a365d" stroke-width="1"/>
+            <polygon points="0,-14 -3,-5 3,-5" fill="#b8383b"/>
+            <polygon points="0,14 -3,5 3,5" fill="#1a365d"/>
+            <text x="0" y="-18" text-anchor="middle" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace">N</text>
+          </g>
+
+          <!-- ====== GREAT BRITAIN (mainland) ====== -->
+          <path d="M192.903,480.667L189.887,483.477L179.934,486.284L175.712,489.205L168.172,495.739L166.815,496.322L155.505,494.69L147.06,486.284L141.783,482.774L139.521,482.306L137.259,483.36L132.282,484.413L127.306,484.296L129.87,480.316L133.338,478.089L125.647,476.565L123.385,475.392L120.972,472.692L114.941,472.222L112.075,472.927L107.099,476.565L99.408,480.433L90.059,475.04L88.249,472.692L88.249,468.109L86.892,464.46L84.329,463.283L87.646,458.567L91.567,455.38L100.313,452.19L113.734,444.851L121.123,441.649L128.06,436.187L130.925,432.858L133.036,428.214L134.997,422.608L138.013,417.949L135.147,416.872L133.79,413.402L134.243,409.927L135.449,406.808L134.393,402.845L132.282,398.757L132.433,395.627L132.885,392.132L127.608,392.373L122.179,393.458L117.353,395.868L112.679,399.118L108.607,399.719L108.607,397.072L110.417,393.819L115.091,389.236L120.218,385.371L122.028,382.347L123.385,378.958L125.949,376.171L132.584,370.953L145.1,365.118L147.06,364.753L152.037,365.483L156.862,364.631L161.085,362.439L165.458,361.952L174.958,368.158L172.093,358.661L176.315,356.466L182.498,364.996L184.76,365.848L189.586,364.631L187.625,363.17L185.514,363.048L182.649,361.83L180.387,359.027L176.315,350.357L176.617,345.217L179.18,339.822L182.196,334.786L179.784,333.803L177.672,331.957L177.22,326.908L177.974,322.591L183.252,318.639L184.76,312.7L185.514,306.129L184.609,303.149L179.331,303.646L176.768,304.888L174.506,306.874L172.093,306.75L165.609,299.419L161.839,293.94L155.204,282.326L154.299,275.311L159.577,260.222L167.871,250.498L177.522,247.081L175.712,246.448L160.934,246.321L155.958,247.588L151.434,251.51L148.87,252.774L146.307,253.153L143.743,255.175L141.481,257.952L138.917,259.717L133.941,259.213L131.528,259.844L129.87,258.204L128.512,255.554L126.552,254.922L124.441,255.68L120.068,259.213L115.544,261.356L110.115,259.087L102.877,254.922L101.52,256.437L99.861,260.348L98.956,266.267L93.98,261.104L89.606,254.038L88.098,249.739L88.098,244.801L90.36,242.773L92.924,244.548L96.694,232.737L104.234,217.298L106.948,212.817L108.758,206.917L108.456,202.935L106.797,199.719L99.861,192.244L99.861,186.044L100.615,179.182L102.575,175.032L103.329,174.253L112.679,174.383L109.059,172.175L101.821,165.931L101.972,163.717L103.631,157.847L102.877,158.5L101.369,161.109L98.353,167.623L96.543,169.185L91.416,170.745L90.511,173.863L89.606,174.772L87.043,175.032L86.289,178.016L85.686,178.275L84.932,175.032L84.932,169.705L85.987,164.759L87.948,160.979L95.337,152.227L91.718,154.973L83.424,163.065L79.201,168.274L78.146,170.095L77.693,171.655L77.693,173.344L79.654,182.68L79.051,186.949L71.963,215.122L70.606,217.938L69.4,219.344L68.193,219.728L64.725,219.216L63.066,217.042L63.066,214.738L63.82,211.151L66.685,197.788L68.042,194.05L70.003,190.566L74.074,184.492L74.074,184.104L71.209,185.268L70.003,184.88L69.249,183.716L69.701,165.671L71.963,159.674L72.868,150.918L74.828,143.448L77.09,137.931L78.9,130.954L81.463,127.789L82.217,123.035L85.083,117.876L87.345,112.442L86.138,112.973L71.662,126.997L67.892,129.635L62.915,128.976L58.994,127.393L55.979,123.96L54.621,117.611L51.002,117.479L47.835,116.286L47.835,115.492L51.907,111.912L58.542,110.717L64.725,105.137L59.145,101.278L59.598,100.079L64.423,96.88L70.455,85.922L71.812,75.863L68.796,71.157L67.741,68.06L62.01,64.555L60.955,60.1L61.709,57.667L63.518,55.232L66.384,53.336L70.908,51.44L66.836,49.542L65.328,47.236L64.122,43.977L64.122,41.938L66.233,33.359L67.439,29.811L69.852,25.301L80.709,25.575L81.916,23.523L83.122,23.386L88.702,25.301L87.797,23.249L78.749,12.416L77.995,10.354L80.559,4.573L80.709,1.954L80.408,-0.943L81.162,-3.014L84.027,-4.12L92.773,-3.982L94.884,-4.949L93.98,-7.854L91.868,-11.592L91.567,-14.642L92.019,-17.418L92.17,-23.117L92.472,-25.483L94.583,-29.245L96.242,-30.361L98.504,-31.059L103.329,-29.803L105.139,-28.27L107.25,-24.648L108.758,-25.065L114.79,-28.827L116.599,-29.385L119.012,-24.926L129.266,-28.548L142.989,-30.082L151.283,-32.454L160.029,-33.292L168.172,-35.946L176.768,-34.689L177.069,-33.152L176.617,-31.059L174.506,-25.205L174.807,-18.668L174.355,-16.585L173.299,-14.226L170.133,-9.653L161.839,-3.153L146.608,11.729L137.56,19.14L136.354,22.701L135.751,27.625L141.029,28.582L143.14,30.22L141.933,32.677L133.941,41.258L131.528,49.135L137.711,48.864L142.687,47.371L152.791,42.482L162.14,38.809L166.664,38.673L175.561,41.53L177.522,41.666L181.292,40.306L185.062,40.17L210.697,40.986L217.785,39.353L222.61,41.394L226.531,46.421L230.301,55.638L230.15,57.126L227.888,61.315L223.666,66.577L220.047,73.847L218.991,77.743L218.388,82.037L217.182,85.922L210.094,104.339L203.007,114.431L199.991,121.713L196.07,127.393L192.451,130.954L188.53,133.325L177.069,135.958L173.903,137.668L170.133,140.822L166.061,142.397L170.736,142.135L175.411,140.428L183.855,139.771L193.657,145.809L192.752,150.656L188.832,154.581L179.934,155.234L171.641,163.717L167.871,166.322L163.95,167.623L158.974,167.233L149.926,165.02L146.005,162.674L149.624,166.452L153.545,168.534L177.069,173.344L178.426,172.824L185.816,167.754L195.768,167.754L214.769,176.978L220.198,184.104L228.039,194.179L232.261,198.174L235.428,201.777L237.238,207.046L241.008,224.709L245.079,241.758L250.659,260.222L253.071,265.26L256.389,268.782L272.977,277.067L276.596,279.698L283.08,287.577L289.263,295.934L294.993,302.279L301.176,307.37L298.16,310.098L296.049,314.31L297.708,319.998L300.12,325.429L305.097,334.171L309.621,343.624L307.962,342.153L306.303,341.417L303.89,341.54L301.628,341.172L297.406,338.226L293.335,334.54L285.342,336.015L280.969,335.401L277.048,335.401L284.437,337.489L292.43,337.735L310.073,353.535L316.105,362.805L319.573,375.079L317.161,380.653L313.391,384.162L309.922,388.27L306.605,392.855L316.407,399.599L318.518,399.359L320.78,398.396L322.74,396.109L326.359,390.563L328.169,388.632L334.201,387.908L339.328,388.27L344.455,389.477L348.979,389.115L358.027,391.529L362.551,393.699L374.162,403.326L376.575,408.608L377.781,415.437L377.932,422.966L375.972,429.882L373.71,436.068L372.353,444.021L371.448,446.983L370.091,449.114L363.908,455.498L359.836,457.977L358.178,456.915L356.368,457.033L356.217,458.567L358.027,461.751L358.178,465.638L354.558,468.461L350.789,469.637L344.757,468.109L336.161,473.396L342.344,476.096L343.55,479.027L342.042,484.062L338.272,486.401L333.899,487.336L329.526,487.57L325.907,488.855L322.439,491.19L326.812,489.906L329.828,491.074L331.788,495.273L333.447,496.555L342.042,498.302L347.169,498.302L357.424,497.254L362.249,497.371L364.059,498.069L364.059,501.561L363.305,510.274L361.948,512.014L348.527,519.193L345.661,524.279L344.907,527.28L337.066,526.818L333.447,529.932L326.962,532.121L322.137,534.424L317.311,537.3L313.24,538.105L296.2,534.654L285.795,534.999L271.77,537.99L268.151,537.415L262.873,534.654L257.294,532.697L250.96,531.891L245.381,529.24L248.849,534.309L241.158,539.139L237.69,540.059L234.071,539.944L226.531,541.322L219.594,540.633L220.65,544.077L222.459,547.059L221.102,548.32L219.444,548.664L206.324,546.371L204.364,546.83L202.856,548.893L198.03,547.862L193.355,544.307L188.379,541.896L183.252,540.748L179.03,541.207L162.14,546.715L158.672,552.328L157.013,560.214L154.6,567.169L150.529,572.518L145.854,573.313L141.33,569.56L132.885,565.46L129.87,562.61L128.965,562.496L128.06,563.523L124.742,564.777L121.274,564.777L115.996,565.916L106.647,569.219L102.877,571.494L94.884,577.743L93.226,579.446L90.36,585.679L85.837,586.811L81.765,582.847L77.09,581.374L72.265,582.847L69.249,584.886L67.892,583.187L67.741,579.672L71.36,575.359L81.011,572.177L89.305,563.751L93.527,558.615L95.035,555.759L97.146,553.93L99.71,553.243L101.067,550.038L112.679,537.185L113.734,534.309L114.337,529.01L115.242,523.932L124.742,520.581L129.266,509.81L130.473,508.998L143.743,507.024L153.545,507.14L163.347,509.23L168.323,509.462L173.299,508.649L177.22,505.747L184.006,495.273L187.776,490.607L192.149,486.401L196.221,481.604L202.856,472.692L198.332,475.744Z"
+                fill="#1a365d" fill-opacity=".18" stroke="#1a365d" stroke-width="1.2" stroke-linejoin="round" filter="url(#coast-glow)"/>
+          <!-- ====== ISLANDS & NORTHERN IRELAND ====== -->
+          <path d="M128.965,363.779L130.624,365.118L135.147,364.874L133.639,367.794L128.814,371.074L125.496,374.23L121.576,376.898L119.615,373.866L117.353,373.988L114.036,368.037L113.433,359.271L117.806,356.954L123.988,357.076Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M197.879,-83.164L193.205,-83.022L195.617,-87.859L198.483,-89.141L203.911,-88.571L203.007,-86.436Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M261.064,-190.245L260.008,-189.211L255.937,-197.938L258.953,-207.882L262.572,-207.585L263.175,-204.91L262.873,-202.535L260.913,-202.238L260.762,-201.496L261.365,-196.901L261.365,-191.575Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M249.905,-192.166L250.809,-186.259L252.921,-187.735L256.238,-181.984L257.897,-181.984L260.611,-184.342L260.008,-179.04L257.294,-164.218L256.389,-161.732L255.937,-157.202L255.333,-156.327L254.429,-147.439L252.619,-144.386L250.96,-137.42L250.357,-136.695L247.944,-139.45L250.357,-150.204L251.262,-156.473L250.659,-159.685L249.302,-162.609L245.682,-162.755L242.666,-161.439L242.063,-163.194L241.912,-165.536L241.158,-166.268L237.087,-166.122L236.031,-166.708L235.126,-168.906L234.976,-170.665L238.746,-171.986L242.063,-171.399L247.19,-174.923L244.024,-186.406L239.801,-187.439L238.896,-188.62L239.65,-190.54L241.912,-191.575L245.532,-197.494L247.643,-198.382L250.206,-198.234Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M272.223,-215.774L272.223,-214.73L270.112,-207.436L270.112,-204.761L266.643,-205.058L266.04,-205.801L265.437,-209.964L265.889,-214.432L266.342,-215.625L267.397,-216.072L268.453,-215.177L270.262,-217.414L271.167,-217.414Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M172.093,-47.571L169.68,-46.589L167.418,-46.589L163.648,-51.223L162.291,-54.738L162.593,-56.99L164.101,-57.695L167.72,-56.568L169.529,-52.628L169.68,-50.099L170.133,-49.115L172.395,-48.133Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M182.046,-43.364L181.593,-43.084L180.085,-44.625L177.522,-49.958L181.593,-50.942L183.403,-50.239L182.649,-47.992Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M176.617,-66.724L176.164,-64.746L179.331,-64.746L183.855,-63.052L186.72,-62.77L188.982,-60.654L187.776,-56.709L186.268,-55.583L184.76,-55.442L179.331,-59.385L172.093,-57.695L170.585,-58.258L169.68,-59.244L169.379,-60.654L169.379,-63.476L168.926,-64.323L166.363,-61.641L165.156,-61.924L164.553,-63.193L164.251,-65.876L164.553,-69.552L166.061,-74.932L168.625,-76.066L172.545,-75.357L176.918,-72.382L178.276,-70.542L178.276,-68.986Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M190.34,-79.471L186.72,-77.484L185.212,-79.187L184.911,-84.444L180.538,-86.72L178.426,-88.144L176.918,-90.708L177.22,-91.564L180.085,-92.704L184.911,-87.859L186.871,-83.875L190.34,-82.738L190.792,-82.17Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M27.93,125.545L25.517,126.073L25.367,124.884L29.589,119.729L32.152,118.935L33.057,119.464L31.248,122.374Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M90.813,210.766L85.535,210.766L83.725,210.125L81.463,208.329L78.9,198.174L79.805,194.566L80.86,192.889L81.916,191.47L84.781,190.825L87.495,192.76L88.551,194.566L90.813,201.52L91.265,207.431Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M62.764,143.841L46.026,148.037L40.296,147.644L39.692,145.546L40.899,144.235L45.573,142.923L47.534,132.798L40.446,128.053L39.994,126.733L40.597,124.488L41.351,123.563L45.724,121.184L47.534,120.655L49.042,120.919L52.209,123.695L55.677,129.372L60.201,130.295L63.368,132.798Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M47.986,174.902L49.494,184.492L51.002,190.437L51.002,192.502L49.645,195.34L42.859,199.075L40.597,199.075L40.597,198.174L42.105,194.308L40.748,190.05L41.351,186.691L40.748,186.173L39.391,186.561L34.414,191.857L32.756,192.373L32.605,191.341L33.811,186.949L33.962,184.104L34.716,182.292L36.073,180.608L37.732,179.312L38.938,179.182L40.296,180.478L44.367,176.848Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M54.621,183.586L53.717,184.363L51.605,184.233L50.851,182.939L50.399,181.126L50.399,177.756L51.605,175.291L57.034,171.655L54.621,170.355L54.471,169.445L55.979,166.322L61.86,161.631L63.368,160.718L64.876,160.848L61.86,169.315Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M45.121,-12.978L39.692,0.851L37.732,1.265L35.772,4.711L30.192,8.566L35.168,8.566L36.526,9.941L36.526,12.553L35.621,14.201L29.136,20.51L24.763,22.975L20.089,29.538L17.676,29.538L15.263,33.768L13.303,35.54L12.247,35.54L10.89,34.722L8.025,30.63L13.303,26.532L13.906,24.344L17.525,21.88L17.223,21.195L11.342,17.906L9.08,15.574L9.382,14.476L12.096,11.866L10.739,11.591L9.834,10.216L8.326,9.666L7.723,8.291L7.572,4.987L7.874,1.403L9.684,-0.115L10.287,-1.771L11.041,-2.186L13.604,-1.357L16.319,1.403L19.335,0.299L22.954,0.851L23.105,0.161L20.39,-6.608L20.843,-7.992L22.351,-9.653L30.644,-14.504L40.899,-22.839L43.462,-24.091L44.216,-22.978L45.272,-18.668Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M41.653,96.613L40.446,97.547L38.938,97.413L37.28,96.079L35.319,92.475L39.843,89.936L41.804,91.406L42.407,93.143L42.407,95.012Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M47.383,54.69L47.232,58.208L46.478,62.26L47.534,66.577L47.685,69.541L49.494,70.618L50.55,71.964L58.391,73.578L65.78,73.04L67.138,74.385L67.288,76.4L66.082,78.549L62.01,82.573L57.034,89L55.526,90.337L53.867,90.471L52.812,89.802L51.907,78.28L46.629,79.757L42.256,79.623L39.843,78.28L38.184,75.594L34.867,68.598L25.065,65.768L22.351,61.99L21.446,59.559L21.898,58.343L23.859,55.502L26.422,56.449L28.081,55.908L28.986,54.555L28.986,53.472L27.629,51.033L27.629,50.22L37.581,47.1L38.335,42.074L40.597,41.666L43.01,43.297L46.478,48.457Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M2.898,40.85L7.572,45.199L3.802,52.524L-1.928,52.524L-10.071,47.236L-10.071,46.15L-9.468,44.52L-8.261,43.161L-6.904,42.89L-4.944,43.841L-2.079,42.346L0.183,42.89Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M1.088,84.985L-0.722,85.387L-2.983,84.985L-4.491,83.779L-5.849,79.086L-6.15,76.132L-5.547,70.753L-5.698,64.42L-0.872,64.15L0.334,65.094L1.088,84.181Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M44.216,309.478L40.748,309.106L38.184,310.346L36.526,311.461L35.018,311.338L30.494,311.709L26.121,311.709L25.517,309.85L26.271,304.142L25.367,302.652L21.295,301.906L19.787,300.538L17.374,296.681L16.922,294.812L16.62,292.319L14.207,289.075L11.192,286.703L9.382,286.578L5.914,290.448L3.048,294.314L4.104,296.183L5.009,298.672L3.35,300.538L-1.325,304.763L-2.079,306.377L-3.436,307.246L-5.698,306.005L-11.277,306.253L-13.841,305.633L-16.857,302.527L-24.246,300.414L-25.603,295.56L-26.96,294.688L-35.405,286.203L-36.461,283.327L-35.405,281.701L-32.238,279.071L-21.682,274.809L-20.024,273.178L-19.722,271.672L-22.889,269.913L-25.603,268.028L-26.508,266.77L-26.659,265.638L-25,264.253L-21.833,264.127L-19.42,264.757L-17.46,263.498L-13.841,262.238L-11.579,260.6L-9.468,256.437L-7.357,252.648L-7.206,250.625L-5.245,243.407L-4.341,241.631L2.294,236.933L3.953,239.6L7.271,240.235L10.287,237.823L13.755,230.318L16.168,229.936L18.882,230.445L24.16,229.554L33.51,226.112L37.732,225.984L43.613,227.77L47.986,227.77L51.907,233.118L54.018,241.504L58.844,249.866L65.328,257.068L65.479,261.356L63.217,263.75L58.391,266.644L58.542,269.787L61.558,268.153L64.272,267.525L70.908,268.153L73.169,271.42L74.677,276.064L75.582,279.948L74.979,284.203L73.32,282.827L71.511,279.071L69.55,277.317L67.138,276.44L68.193,281.576L67.741,288.576L68.796,289.2L71.963,289.325L69.852,296.307L65.63,298.299L60.653,299.046L59.447,301.533L58.542,304.763L55.979,309.478L52.661,312.205L48.439,311.709Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M260.159,542.93L256.54,545.225L255.484,547.862L254.579,548.893L252.317,549.58L250.055,549.695L241.309,544.307L239.198,544.536L241.158,542.011L246.738,540.059L249.754,537.415L256.841,539.944Z" fill="#1a365d" fill-opacity=".12" stroke="#1a365d" stroke-width=".8" stroke-linejoin="round"/>
+
+<!-- ====== VINTAGE MAP FRAME ====== -->
+<rect x="6" y="6" width="388" height="538" rx="6" fill="none" stroke="#1a365d" stroke-width=".5" stroke-dasharray="2,4" opacity=".15"/>
+<rect x="10" y="10" width="380" height="530" rx="4" fill="none" stroke="#1a365d" stroke-width=".3" opacity=".1"/>
+<!-- Corner ornaments -->
+<g opacity=".12" fill="none" stroke="#1a365d" stroke-width=".6">
+  <path d="M16,16 Q16,26 26,26 M16,16 L16,30 M16,16 L30,16"/>
+  <path d="M384,16 Q384,26 374,26 M384,16 L384,30 M384,16 L370,16"/>
+  <path d="M16,534 Q16,524 26,524 M16,534 L16,520 M16,534 L30,534"/>
+  <path d="M384,534 Q384,524 374,524 M384,534 L384,520 M384,534 L370,534"/>
+</g>
+
+<!-- ====== MAP TITLE CARTOUCHE ====== -->
+<g class="map-title-cartouche" transform="translate(300,55)">
+  <rect x="-50" y="-22" width="100" height="44" rx="4" fill="white" fill-opacity=".6" stroke="#1a365d" stroke-width=".5" opacity=".8"/>
+  <rect x="-46" y="-18" width="92" height="36" rx="2" fill="none" stroke="#1a365d" stroke-width=".3" opacity=".4"/>
+  <text x="0" y="-4" text-anchor="middle" font-size="9" fill="#1a365d" font-weight="bold" letter-spacing="2" font-family="'Noto Serif SC',serif">大不列颠</text>
+  <text x="0" y="8" text-anchor="middle" font-size="6" fill="#1a365d" letter-spacing="1" font-family="'JetBrains Mono',monospace" opacity=".6">GREAT BRITAIN</text>
+  <text x="0" y="16" text-anchor="middle" font-size="5" fill="#c53030" font-family="'Noto Serif SC',serif" opacity=".7">玟思的求学之路</text>
+</g>
+
+<!-- ====== SEA AREA LABELS ====== -->
+<g class="map-landmarks" opacity=".35">
+  <text x="330" y="200" font-size="11" fill="#4a7fb5" font-style="italic" letter-spacing="4" transform="rotate(-15,330,200)" font-family="'Noto Serif SC',serif">North Sea</text>
+  <text x="330" y="218" font-size="6" fill="#4a7fb5" letter-spacing="2" transform="rotate(-15,330,218)" font-family="'JetBrains Mono',monospace">北 海</text>
+  <text x="100" y="440" font-size="9" fill="#4a7fb5" font-style="italic" letter-spacing="3" transform="rotate(25,100,440)" font-family="'Noto Serif SC',serif">Bristol Channel</text>
+  <text x="310" y="540" font-size="10" fill="#4a7fb5" font-style="italic" letter-spacing="3" font-family="'Noto Serif SC',serif">English Channel</text>
+  <text x="310" y="553" font-size="6" fill="#4a7fb5" letter-spacing="2" font-family="'JetBrains Mono',monospace">英 吉 利 海 峡</text>
+  <text x="30" y="220" font-size="9" fill="#4a7fb5" font-style="italic" letter-spacing="2" transform="rotate(-30,30,220)" font-family="'Noto Serif SC',serif">Irish Sea</text>
+  <text x="15" y="370" font-size="8" fill="#4a7fb5" font-style="italic" letter-spacing="2" transform="rotate(-70,15,370)" font-family="'Noto Serif SC',serif">Atlantic Ocean</text>
+  <text x="30" y="530" font-size="8" fill="#4a7fb5" font-style="italic" letter-spacing="2" font-family="'Noto Serif SC',serif">Celtic Sea</text>
+</g>
+
+<!-- ====== TERRAIN HINTS ====== -->
+<g opacity=".06" stroke="#1a365d" stroke-width=".4" fill="none">
+  <!-- Scottish Highlands hatching -->
+  <path d="M90,60 L100,40 M95,65 L105,45 M100,70 L110,50 M85,80 L95,60 M105,55 L115,35"/>
+  <path d="M110,90 L120,70 M115,95 L125,75 M120,85 L130,65"/>
+  <!-- Pennines ridge -->
+  <path d="M215,260 L225,250 M218,275 L228,265 M220,290 L230,280 M222,305 L232,295 M225,320 L235,310"/>
+  <!-- Lake District dots -->
+  <circle cx="170" cy="270" r="1.5" fill="#4a7fb5" stroke="none" opacity=".3"/>
+  <circle cx="175" cy="278" r="1" fill="#4a7fb5" stroke="none" opacity=".2"/>
+  <circle cx="165" cy="280" r="1.2" fill="#4a7fb5" stroke="none" opacity=".25"/>
+  <!-- Snowdonia hint -->
+  <path d="M135,405 L145,390 M140,408 L150,393"/>
+</g>
+
+<!-- ====== STREET NETWORKS ====== -->
+<g class="map-streets">
+  <!-- London streets -->
+  <g stroke="#1a365d" stroke-width=".3" opacity=".8">
+    <line x1="300" y1="488" x2="285" y2="478"/>
+    <line x1="300" y1="488" x2="315" y2="478"/>
+    <line x1="300" y1="488" x2="295" y2="473"/>
+    <line x1="300" y1="488" x2="308" y2="475"/>
+    <line x1="300" y1="488" x2="310" y2="495"/>
+    <line x1="300" y1="488" x2="290" y2="498"/>
+    <line x1="300" y1="488" x2="312" y2="483"/>
+    <line x1="300" y1="488" x2="288" y2="490"/>
+    <!-- Thames hint -->
+    <path d="M282,492 Q290,488 300,490 Q310,492 318,488" stroke="#4a7fb5" stroke-width=".5" fill="none" opacity=".4"/>
+  </g>
+  <!-- Leeds streets -->
+  <g stroke="#1a365d" stroke-width=".25" opacity=".6">
+    <line x1="240" y1="330" x2="228" y2="322"/>
+    <line x1="240" y1="330" x2="252" y2="322"/>
+    <line x1="240" y1="330" x2="240" y2="318"/>
+    <line x1="240" y1="330" x2="230" y2="338"/>
+    <line x1="240" y1="330" x2="250" y2="340"/>
+  </g>
+  <!-- Edinburgh streets -->
+  <g stroke="#1a365d" stroke-width=".25" opacity=".6">
+    <line x1="171" y1="173" x2="160" y2="165"/>
+    <line x1="171" y1="173" x2="182" y2="165"/>
+    <line x1="171" y1="173" x2="171" y2="160"/>
+    <line x1="171" y1="173" x2="162" y2="180"/>
+    <line x1="171" y1="173" x2="180" y2="182"/>
+  </g>
+  <!-- Guildford streets -->
+  <g stroke="#1a365d" stroke-width=".25" opacity=".6">
+    <line x1="280" y1="506" x2="270" y2="498"/>
+    <line x1="280" y1="506" x2="290" y2="498"/>
+    <line x1="280" y1="506" x2="275" y2="515"/>
+    <line x1="280" y1="506" x2="288" y2="514"/>
+  </g>
+</g>
+
+<!-- ====== LANDMARK ILLUSTRATIONS ====== -->
+<g class="map-landmarks">
+  <!-- Big Ben near London -->
+  <g transform="translate(314,470)" opacity=".4">
+    <rect x="-1.5" y="-12" width="3" height="12" fill="#1a365d" rx=".5"/>
+    <rect x="-3" y="-16" width="6" height="4" fill="#1a365d" rx=".5"/>
+    <polygon points="0,-19 -2,-16 2,-16" fill="#1a365d"/>
+    <circle cx="0" cy="-14" r="1.5" fill="none" stroke="#1a365d" stroke-width=".3"/>
+    <text x="5" y="-8" font-size="5" fill="#1a365d" font-family="'JetBrains Mono',monospace">Big Ben</text>
+  </g>
+  <!-- London Eye -->
+  <g transform="translate(293,480)" opacity=".3">
+    <circle cx="0" cy="0" r="5" fill="none" stroke="#1a365d" stroke-width=".4"/>
+    <line x1="-5" y1="0" x2="5" y2="0" stroke="#1a365d" stroke-width=".2"/>
+    <line x1="0" y1="-5" x2="0" y2="5" stroke="#1a365d" stroke-width=".2"/>
+    <line x1="-3.5" y1="-3.5" x2="3.5" y2="3.5" stroke="#1a365d" stroke-width=".2"/>
+    <line x1="-3.5" y1="3.5" x2="3.5" y2="-3.5" stroke="#1a365d" stroke-width=".2"/>
+    <line x1="0" y1="5" x2="0" y2="8" stroke="#1a365d" stroke-width=".4"/>
+  </g>
+  <!-- Edinburgh Castle -->
+  <g transform="translate(158,162)" opacity=".35">
+    <rect x="0" y="-6" width="8" height="6" fill="#1a365d" rx=".3"/>
+    <rect x="1" y="-9" width="2" height="3" fill="#1a365d"/>
+    <rect x="5" y="-8" width="2" height="2" fill="#1a365d"/>
+    <polygon points="2,-11 1,-9 3,-9" fill="#1a365d"/>
+    <text x="-2" y="3" font-size="5" fill="#1a365d" font-family="'JetBrains Mono',monospace">Castle</text>
+  </g>
+  <!-- University building near Leeds -->
+  <g transform="translate(248,318)" opacity=".35">
+    <rect x="0" y="-5" width="10" height="5" fill="#1a365d" rx=".3"/>
+    <polygon points="5,-8 0,-5 10,-5" fill="#1a365d"/>
+    <line x1="3" y1="-5" x2="3" y2="0" stroke="white" stroke-width=".3"/>
+    <line x1="7" y1="-5" x2="7" y2="0" stroke="white" stroke-width=".3"/>
+    <text x="-2" y="5" font-size="4.5" fill="#c53030" font-family="'JetBrains Mono',monospace">UoL</text>
+  </g>
+  <!-- University of Surrey near Guildford -->
+  <g transform="translate(264,498)" opacity=".35">
+    <rect x="0" y="-5" width="8" height="5" fill="#1a365d" rx=".3"/>
+    <rect x="2" y="-8" width="4" height="3" fill="#1a365d" rx=".3"/>
+    <circle cx="4" cy="-6.5" r="1" fill="none" stroke="white" stroke-width=".3"/>
+    <text x="-2" y="5" font-size="4.5" fill="#c53030" font-family="'JetBrains Mono',monospace">Surrey</text>
+  </g>
+  <!-- Manchester - football hint -->
+  <g transform="translate(203,346)" opacity=".25">
+    <circle cx="0" cy="0" r="2.5" fill="none" stroke="#1a365d" stroke-width=".4"/>
+    <path d="M-1.5,-1 L0,-2.2 L1.5,-1 L1,1 L-1,1Z" fill="none" stroke="#1a365d" stroke-width=".3"/>
+  </g>
+  <!-- Liverpool - music note -->
+  <g transform="translate(172,352)" opacity=".25">
+    <circle cx="0" cy="0" r="1.5" fill="#1a365d"/>
+    <line x1="1.5" y1="0" x2="1.5" y2="-6" stroke="#1a365d" stroke-width=".4"/>
+    <path d="M1.5,-6 Q4,-7 4,-4" fill="none" stroke="#1a365d" stroke-width=".4"/>
+  </g>
+</g>
+
+<!-- ====== DECORATIVE ELEMENTS ====== -->
+<g opacity=".08">
+  <!-- Small ships in the sea -->
+  <g transform="translate(350,300)">
+    <path d="M-5,0 Q0,-3 5,0 Z" fill="#1a365d"/>
+    <line x1="0" y1="0" x2="0" y2="-5" stroke="#1a365d" stroke-width=".4"/>
+    <polygon points="0,-5 5,-3 0,-1" fill="#1a365d" opacity=".5"/>
+  </g>
+  <g transform="translate(60,450)">
+    <path d="M-4,0 Q0,-2.5 4,0 Z" fill="#1a365d"/>
+    <line x1="0" y1="0" x2="0" y2="-4" stroke="#1a365d" stroke-width=".3"/>
+    <polygon points="0,-4 4,-2.5 0,-1" fill="#1a365d" opacity=".5"/>
+  </g>
+  <!-- Sea monster (fun detail) -->
+  <g transform="translate(50,500)">
+    <path d="M0,0 Q3,-4 6,0 Q9,-3 12,0 Q15,-2 18,1" fill="none" stroke="#1a365d" stroke-width=".6"/>
+    <circle cx="0" cy="0" r="1" fill="#1a365d"/>
+  </g>
+</g>
+
+<!-- ====== SCALE BAR ====== -->
+<g transform="translate(310,530)" opacity=".3">
+  <line x1="0" y1="0" x2="60" y2="0" stroke="#1a365d" stroke-width=".8"/>
+  <line x1="0" y1="-3" x2="0" y2="3" stroke="#1a365d" stroke-width=".5"/>
+  <line x1="30" y1="-2" x2="30" y2="2" stroke="#1a365d" stroke-width=".4"/>
+  <line x1="60" y1="-3" x2="60" y2="3" stroke="#1a365d" stroke-width=".5"/>
+  <text x="0" y="9" font-size="5" fill="#1a365d" font-family="'JetBrains Mono',monospace">0</text>
+  <text x="25" y="9" font-size="5" fill="#1a365d" font-family="'JetBrains Mono',monospace">50</text>
+  <text x="52" y="9" font-size="5" fill="#1a365d" font-family="'JetBrains Mono',monospace">100km</text>
+</g>
+
+<!-- ====== REGION LABELS ====== -->
+<g opacity=".12" font-family="'Noto Serif SC',serif" fill="#1a365d">
+  <text x="100" y="100" font-size="7" font-style="italic" letter-spacing="2">Scottish Highlands</text>
+  <text x="155" y="250" font-size="6" font-style="italic" letter-spacing="1">Lake District</text>
+  <text x="215" y="380" font-size="6" font-style="italic">Midlands</text>
+  <text x="120" y="430" font-size="6" font-style="italic">Wales</text>
+  <text x="135" y="470" font-size="6" font-style="italic">South West</text>
+  <text x="260" y="520" font-size="6" font-style="italic">South East</text>
+</g>
+
+<!-- ====== JOURNEY ROUTE ====== -->
+<!-- Fuqing → London long arc -->
+<path d="M370,510 Q395,400 370,300 Q340,180 300,488" stroke="#c53030" stroke-width=".6" stroke-dasharray="2,4" fill="none" opacity=".2"/>
+<text x="378" y="350" font-size="5" fill="#c53030" opacity=".3" font-family="'JetBrains Mono',monospace" transform="rotate(-80,378,350)">9,500 km</text>
+<!-- Small airplane -->
+<g transform="translate(365,290) rotate(-50)" opacity=".2">
+  <path d="M-3,0 L0,-6 L3,0 L1,0 L1,3 L-1,3 L-1,0 Z" fill="#c53030"/>
+</g>
+<!-- London → Guildford -->
+<path d="M300,488 Q292,498 280,506" stroke="#c53030" stroke-width=".8" stroke-dasharray="3,3" fill="none" opacity=".3"/>
+<!-- Guildford → Leeds -->
+<path d="M280,506 Q265,440 240,330" stroke="#c53030" stroke-width=".8" stroke-dasharray="3,3" fill="none" opacity=".25"/>
+<text x="258" y="420" font-size="5" fill="#c53030" opacity=".4" font-family="'JetBrains Mono',monospace" transform="rotate(-75,258,420)">A1(M) ↑</text>
+
+<!-- Pulse rings for key cities -->
+<circle cx="240" cy="330" r="3.5" fill="none" stroke="#c53030" stroke-width=".5" opacity=".3">
+  <animate attributeName="r" from="3.5" to="12" dur="2s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" from=".3" to="0" dur="2s" repeatCount="indefinite"/>
+</circle>
+<circle cx="280" cy="506" r="3.5" fill="none" stroke="#c53030" stroke-width=".5" opacity=".3">
+  <animate attributeName="r" from="3.5" to="12" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" from=".3" to="0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+</circle>
+
+<!-- ====== CITY MARKERS ====== -->
+          <g class="map-cities">
+            <circle cx="171" cy="173" r="3" fill="#b8383b"/><text x="179" y="177" font-size="9" fill="#1a365d" font-family="'JetBrains Mono',monospace">Edinburgh</text>
+            <circle cx="237" cy="246" r="2.5" fill="#1a365d" opacity=".6"/><text x="243" y="250" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Newcastle</text>
+            <circle cx="240" cy="330" r="3.5" fill="#c53030"/>
+            <text x="248" y="334" font-size="10" fill="#c53030" font-weight="bold" font-family="'JetBrains Mono',monospace">Leeds</text>
+            <text x="248" y="346" font-size="7" fill="#c53030" font-family="'JetBrains Mono',monospace" opacity=".8">即将出发</text>
+            <circle cx="211" cy="353" r="2.5" fill="#1a365d" opacity=".6"/><text x="165" y="357" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Manchester</text>
+            <circle cx="179" cy="358" r="2.5" fill="#1a365d" opacity=".6"/><text x="145" y="362" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Liverpool</text>
+            <circle cx="225" cy="422" r="2.5" fill="#1a365d" opacity=".6"/><text x="233" y="426" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Birmingham</text>
+            <circle cx="252" cy="472" r="2.5" fill="#1a365d" opacity=".6"/><text x="260" y="476" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Oxford</text>
+            <circle cx="310" cy="441" r="2.5" fill="#1a365d" opacity=".6"/><text x="316" y="445" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Cambridge</text>
+            <circle cx="300" cy="488" r="4" fill="#1a365d"/>
+            <text x="308" y="492" font-size="10" fill="#1a365d" font-weight="bold" font-family="'JetBrains Mono',monospace">London</text>
+            <circle cx="280" cy="506" r="3.5" fill="#c53030"/>
+            <text x="221" y="510" font-size="10" fill="#c53030" font-weight="bold" font-family="'JetBrains Mono',monospace">Guildford</text>
+            <text x="221" y="522" font-size="7" fill="#c53030" font-family="'JetBrains Mono',monospace" opacity=".8">University of Surrey</text>
+            <circle cx="196" cy="492" r="2.5" fill="#1a365d" opacity=".6"/><text x="158" y="496" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Bristol</text>
+            <circle cx="172" cy="490" r="2.5" fill="#1a365d" opacity=".6"/><text x="132" y="494" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Cardiff</text>
+            <circle cx="350" cy="504" r="2" fill="#1a365d" opacity=".4"/><text x="356" y="508" font-size="7" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".4">Canterbury</text>
+            <circle cx="56" cy="273" r="2.5" fill="#1a365d" opacity=".6"/><text x="20" y="277" font-size="8" fill="#1a365d" font-family="'JetBrains Mono',monospace" opacity=".6">Belfast</text>
+          </g>
+
+          <!-- Fuqing callout -->
+          <g class="fuqing-callout" transform="translate(310,490)">
+            <line x1="0" y1="0" x2="50" y2="30" stroke="#c53030" stroke-width="1" stroke-dasharray="3,2"/>
+            <rect x="48" y="20" width="80" height="28" rx="4" fill="white" stroke="#c53030" stroke-width=".8"/>
+            <text x="88" y="34" text-anchor="middle" font-size="9" fill="#c53030" font-weight="bold" font-family="'Noto Serif SC',serif">福清 Fuqing</text>
+            <text x="88" y="44" text-anchor="middle" font-size="7" fill="#1a365d" font-family="'JetBrains Mono',monospace">起点 · 永远的家</text>
+          </g>
+        </svg>
+      </div>
+      <div class="add-pin-form" id="pin-form">
+        <input type="text" id="pin-name" placeholder="这个地方叫什么？">
+        <input type="text" id="pin-memo" placeholder="关于这里的记忆（可选）">
+        <button onclick="confirmPin()">添加</button>
+        <button onclick="cancelPin()" style="background:transparent;color:var(--txt2);margin-left:8px">取消</button>
+      </div>
+      <div class="map-hint">点击地图任意位置添加你自己的标记 · 已标记的城市会显示在地图上</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERACTIVE GLOBE -->
+<section id="globe-sec">
+  <div class="container">
+    <div class="sec-title fade-in">你的世界 · Your World</div>
+    <div class="sec-sub fade-in">从福清到利兹，点击地球放大探索</div>
+    <div id="globe-widget" class="fade-in" onclick="openGlobe()"></div>
+    <div class="globe-hint fade-in">拖拽旋转 · 滚轮缩放 · Click to expand</div>
+    <div class="globe-city-tags fade-in">
+      <span class="globe-city-tag"><span class="dot" style="background:#e53e3e"></span>福清 25.7°N</span>
+      <span class="globe-city-tag"><span class="dot" style="background:#38a169"></span>Guildford 51.2°N</span>
+      <span class="globe-city-tag"><span class="dot" style="background:#3182ce"></span>Leeds 53.8°N</span>
+    </div>
+  </div>
+</section>
+
+<div id="globe-modal">
+  <div id="globe-modal-box">
+    <button id="globe-close" onclick="closeGlobe()">✕</button>
+    <div class="globe-modal-hint">拖拽旋转 · 滚轮缩放</div>
+  </div>
+</div>
+
+<!-- FORMULAS -->
+<section id="formulas">
+  <div class="container">
+    <div class="sec-title fade-in">土力学公式 · Life Equations</div>
+    <div class="sec-sub fade-in">用你最熟悉的语言，说你最懂的道理</div>
+    <div class="formula-grid" id="formula-grid"></div>
+  </div>
+</section>
+
+<!-- LETTER -->
+<section id="letter">
+  <div class="container">
+    <div class="sec-title fade-in" style="text-align:center">一封信</div>
+    <div class="sec-sub fade-in" style="text-align:center">写在七月二十四日之前</div>
+    <div class="letter-body fade-in">
+      <p>玟思：</p>
+      <p>你是那种让人觉得"这个人一个人也能把世界撑起来"的人。不管生活丢过来多少事情，你永远不抱怨、不慌张，安安静静地一件一件处理好。这种从容不是天生的——它是你在一次又一次独自面对问题的时候，慢慢长出来的。</p>
+      <p>从福清到萨里，从土木工程到岩土工程，从实习到申请利兹——每一步都是你自己选的，每一步都走得很稳。你就像你研究的那些地层一样，经过时间的压实和胶结，变得越来越坚固。</p>
+      <p>你写诗的时候是柔软的，你做计算的时候是精确的，你一个人扛事情的时候是坚韧的，你和朋友聊天的时候是温暖的。这些不矛盾，它们构成了一个完整的你——就像不同矿物组成一块岩石，每一种都不可或缺。</p>
+      <p>生日快乐。愿你的人生承载力永远大于荷载，愿你的固结沉降总是趋于稳定，愿你脚下的每一寸土地，都稳稳地托住你。</p>
+      <div class="letter-sign">—— 你的朋友</div>
+    </div>
+  </div>
+</section>
+
+<!-- POETRY COLLECTION -->
+<section id="poetry">
+  <div class="container">
+    <div class="sec-title fade-in">她的诗集 · Her Verses</div>
+    <div class="sec-sub fade-in">温舍何的诗，点击卡片翻开</div>
+    <div class="poem-grid" id="poem-grid"></div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:40px;font-size:11px;color:var(--txt2);font-family:'JetBrains Mono',monospace">
+  Built with code & care · 2026
+</footer>
+
+<!-- THREE.JS (CDN fallback chain for China access) -->
+<script>
+window.__threeFB2=function(){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/scr'+'ipt>')};
+window.__threeFB1=function(){document.write('<scr'+'ipt src="https://cdn.bootcdn.net/ajax/libs/three.js/r128/three.min.js" onerror="window.__threeFB2()"><\/scr'+'ipt>')};
+document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="window.__threeFB1()"><\/scr'+'ipt>');
+</script>
+<script>
+/* ===== COUNTDOWN ===== */
+const TARGET = new Date('2026-07-24T00:00:00+01:00').getTime();
+function tick(){
+  const now = Date.now(), diff = Math.max(0, TARGET - now);
+  const d = Math.floor(diff/864e5), h = Math.floor(diff%864e5/36e5);
+  const m = Math.floor(diff%36e5/6e4), s = Math.floor(diff%6e4/1e3);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+/* ===== SOIL PROFILE ===== */
+const LAYERS = [
+  { depth:'0.0–0.8m', name:'填土层 · Fill', type:'ML', color:'#c4a882',
+    params:'γ=16.5 kN/m³  w=22%  loose',
+    msg:'你从福清出发，带着一箱行李和一颗比谁都坚定的心，跨越了整个亚欧大陆。那层填土是你人生的第一层新地基——从家乡铺向异国。你说走就走，头也不回。' },
+  { depth:'0.8–3.0m', name:'粉质黏土 · Silty Clay', type:'CL', color:'#a0845c',
+    params:'γ=18.2 kN/m³  φ\'=22°  c\'=8 kPa  Ip=18',
+    msg:'在英国的少年时代，你在一种陌生的语言和气候里慢慢适应。黏土的塑性就像你那段日子的韧性——可以被捏成任何形状，但从不碎裂。你学会了用另一种语言思考，用另一种方式生活。' },
+  { depth:'3.0–6.5m', name:'细砂层 · Fine Sand', type:'SP', color:'#d4a76a',
+    params:'γ=19.0 kN/m³  φ\'=33°  k=2×10⁻⁴ m/s  D₆₀=0.4mm',
+    msg:'萨里大学的四年，是你人生最透水的阶段——所有可能性都在流动，而你像砂层一样，稳稳地过滤掉了噪音，只留下了自己真正想要的方向：岩土。你在咨询公司和设计院实习了一圈，最终还是觉得脚下的大地最有意思。' },
+  { depth:'6.5–10.0m', name:'粉土层 · Silt', type:'ML', color:'#8b9dc3',
+    params:'γ=18.8 kN/m³  φ\'=28°  Cc=0.25  e₀=0.72',
+    msg:'现在你站在申请利兹的路口，粉土的特性是"过渡"——不是砂也不是黏土，但兼有两者的优点。你现在的状态也是这样：在学术和实践之间、在英国和中国之间、在已知和未知之间，找到属于自己的位置。' },
+  { depth:'10.0–14.0m', name:'强风化岩 · Weathered Rock', type:'SW', color:'#6b7c5e',
+    params:'γ=21.5 kN/m³  qu=12 MPa  RQD=35%  Grade IV',
+    msg:'你已经很硬了，但还在继续变硬。风化岩看上去满是裂痕，实际上每一道裂纹都是成长的记录——你的独立、你的成熟、你独自处理的那些账单和合同，都刻在这些纹理里。' },
+  { depth:'>14.0m', name:'基岩 · Bedrock', type:'GR', color:'#4a5568',
+    params:'γ=25.0 kN/m³  qu=85 MPa  RQD=92%  Grade I',
+    msg:'基岩是所有工程的终极持力层。你心里那个"我要成为一个什么样的人"的答案，就像这块基岩一样——不管上面覆盖了多少层生活的沉积物，它一直在那里，坚硬、完整、不可动摇。' }
+];
+
+(function buildSoil(){
+  const grid = document.getElementById('soil-grid');
+  LAYERS.forEach((L,i)=>{
+    grid.innerHTML += `<div class="soil-depth">${L.depth}</div>
+    <div class="soil-layer" style="border-left:4px solid ${L.color}" onclick="toggleLayer(this)">
+      <div class="layer-head">
+        <span class="layer-name">${L.name}</span>
+        <span class="layer-type">${L.type}</span>
+      </div>
+      <div class="layer-params">${L.params}</div>
+      <div class="layer-msg">${L.msg}</div>
+      <span class="layer-hint">点击展开</span>
+    </div>`;
+  });
+})();
+function toggleLayer(el){ el.classList.toggle('expanded'); }
+
+/* ===== THREE.JS 3D SPECIMEN ===== */
+(function(){
+  const box = document.getElementById('three-box');
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(45, box.clientWidth/box.clientHeight, 0.1, 100);
+  cam.position.z = 4.5;
+  const ren = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  ren.setSize(box.clientWidth, box.clientHeight);
+  ren.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  box.appendChild(ren.domElement);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x4466aa, 0.4));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.9);
+  dl.position.set(3,5,4); scene.add(dl);
+  const dl2 = new THREE.DirectionalLight(0x88ccff, 0.3);
+  dl2.position.set(-3,-2,2); scene.add(dl2);
+
+  // Crystal Cluster — multiple prisms growing from a shared base
+  const cluster = new THREE.Group();
+  const crystalMat = new THREE.MeshPhongMaterial({
+    color:0x4488bb, flatShading:true, shininess:120,
+    transparent:true, opacity:0.82, specular:0x88ccff
+  });
+  const crystalMat2 = new THREE.MeshPhongMaterial({
+    color:0x66aadd, flatShading:true, shininess:100,
+    transparent:true, opacity:0.75, specular:0xaaddff
+  });
+  const crystalMat3 = new THREE.MeshPhongMaterial({
+    color:0x336699, flatShading:true, shininess:140,
+    transparent:true, opacity:0.88, specular:0x66aaee
+  });
+  const mats = [crystalMat, crystalMat2, crystalMat3];
+
+  // Each crystal: [radiusTop, radiusBottom, height, x, y, z, rotX, rotZ, segments]
+  const specs = [
+    [0.18, 0.35, 2.2,  0,    0,    0,    0,     0,    6],  // main central crystal
+    [0.14, 0.28, 1.8,  0.5, -0.2,  0.3,  0.15, -0.1, 6],  // right
+    [0.12, 0.25, 1.6, -0.45,-0.3,  0.2, -0.1,   0.2, 5],  // left
+    [0.10, 0.22, 1.3,  0.3, -0.4, -0.4,  0.2,   0.15,6],  // back-right
+    [0.15, 0.30, 1.5, -0.3, -0.1, -0.35, -0.15, -0.2, 6], // back-left
+    [0.08, 0.18, 1.0,  0.6, -0.5,  0.1,  0.3,   0.0, 5],  // small right
+    [0.09, 0.20, 1.1, -0.55,-0.5, -0.1, -0.05,  0.3, 5],  // small left
+    [0.07, 0.15, 0.8,  0.15,-0.6,  0.5,  0.1,  -0.15,4],  // tiny front
+  ];
+
+  specs.forEach((s, idx) => {
+    const geo = new THREE.CylinderGeometry(s[0], s[1], s[2], s[8], 4);
+    // Displace vertices for natural irregularity
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const px = pos.getX(i), py = pos.getY(i), pz = pos.getZ(i);
+      const noise = (Math.sin(px*12+idx)*0.03 + Math.cos(pz*10+py*8)*0.02);
+      pos.setX(i, px + noise);
+      pos.setZ(i, pz + noise);
+    }
+    geo.computeVertexNormals();
+    // Add pointed top (pyramid cap)
+    const topGeo = new THREE.ConeGeometry(s[0]*1.05, s[2]*0.3, s[8], 1);
+    const topPos = topGeo.attributes.position;
+    for (let i = 0; i < topPos.count; i++) {
+      const px = topPos.getX(i), pz = topPos.getZ(i);
+      const n = Math.sin(px*15+idx*2)*0.02;
+      topPos.setX(i, px+n); topPos.setZ(i, pz+n);
+    }
+    topGeo.computeVertexNormals();
+    topGeo.translate(0, s[2]*0.5 + s[2]*0.15, 0);
+
+    const mat = mats[idx % 3];
+    const prism = new THREE.Mesh(geo, mat);
+    const cap = new THREE.Mesh(topGeo, mat);
+    const sub = new THREE.Group();
+    sub.add(prism); sub.add(cap);
+    sub.position.set(s[3], s[4], s[5]);
+    sub.rotation.set(s[6], 0, s[7]);
+    cluster.add(sub);
+
+    // Wireframe for each crystal
+    const wireMat = new THREE.LineBasicMaterial({color:0xaaddff, transparent:true, opacity:0.15});
+    cluster.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), wireMat).translateX(s[3]).translateY(s[4]).translateZ(s[5]));
+  });
+
+  // Base rock — rough dodecahedron
+  const baseGeo = new THREE.DodecahedronGeometry(0.7, 1);
+  const basePos = baseGeo.attributes.position;
+  for (let i = 0; i < basePos.count; i++) {
+    const py = basePos.getY(i);
+    if (py > 0.1) basePos.setY(i, py * 0.3); // flatten top
+    const n = Math.sin(basePos.getX(i)*8)*0.06 + Math.cos(basePos.getZ(i)*6)*0.05;
+    basePos.setX(i, basePos.getX(i)+n);
+    basePos.setZ(i, basePos.getZ(i)+n);
+  }
+  baseGeo.computeVertexNormals();
+  const baseMat = new THREE.MeshPhongMaterial({color:0x556677, flatShading:true, shininess:20});
+  const base = new THREE.Mesh(baseGeo, baseMat);
+  base.position.y = -1.1;
+  cluster.add(base);
+
+  cluster.position.y = -0.2;
+  scene.add(cluster);
+  const crystal = cluster; // alias for rotation below
+
+  // Particles
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(300*3);
+  for(let i=0;i<900;i++) pPos[i]=(Math.random()-.5)*7;
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({size:0.015, color:0x88bbee, transparent:true, opacity:0.4})));
+
+  let dragging=false, prev={x:0,y:0}, rot={x:0,y:0};
+  box.addEventListener('pointerdown',e=>{dragging=true;prev={x:e.clientX,y:e.clientY}});
+  window.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    rot.y+=(e.clientX-prev.x)*.008;
+    rot.x+=(e.clientY-prev.y)*.008;
+    prev={x:e.clientX,y:e.clientY};
+  });
+  window.addEventListener('pointerup',()=>dragging=false);
+
+  (function anim(){
+    requestAnimationFrame(anim);
+    if(!dragging){rot.y+=.004;rot.x+=.001}
+    crystal.rotation.set(rot.x,rot.y,0);
+    ren.render(scene, cam);
+  })();
+
+  window.addEventListener('resize',()=>{
+    cam.aspect=box.clientWidth/box.clientHeight;
+    cam.updateProjectionMatrix();
+    ren.setSize(box.clientWidth,box.clientHeight);
+  });
+})();
+
+/* ===== UK MAP ===== */
+const DEFAULT_PINS = [];
+const mapArea = document.getElementById('map-area');
+let pendingPin = null;
+
+function renderPins(pins){
+  mapArea.querySelectorAll('.map-pin').forEach(p=>p.remove());
+  pins.forEach(p=>{
+    const div = document.createElement('div');
+    div.className = 'map-pin' + (p.custom?' custom':'');
+    div.style.left = p.x+'%'; div.style.top = p.y+'%';
+    div.innerHTML = `<svg width="18" height="24" viewBox="0 0 18 24"><path d="M9,0 C4,0 0,4 0,9 C0,16 9,24 9,24 C9,24 18,16 18,9 C18,4 14,0 9,0Z" fill="#c53030"/><circle cx="9" cy="8" r="3.5" fill="white"/></svg>
+    <div class="map-pin-label">${p.name}${p.memo?' · '+p.memo:''}</div>`;
+    mapArea.appendChild(div);
+  });
+}
+let userPins = [];
+try{ userPins = JSON.parse(sessionStorage.getItem('wensi-map-pins')||'[]'); }catch(e){}
+renderPins([...DEFAULT_PINS, ...userPins]);
+
+mapArea.addEventListener('click', function(e){
+  if(e.target.closest('.map-pin'))return;
+  const rect = mapArea.getBoundingClientRect();
+  pendingPin = {x:((e.clientX-rect.left)/rect.width*100), y:((e.clientY-rect.top)/rect.height*100), custom:true};
+  document.getElementById('pin-form').classList.add('show');
+  document.getElementById('pin-name').focus();
+});
+function confirmPin(){
+  if(!pendingPin)return;
+  pendingPin.name = document.getElementById('pin-name').value || '未命名';
+  pendingPin.memo = document.getElementById('pin-memo').value || '';
+  userPins.push(pendingPin);
+  try{ sessionStorage.setItem('wensi-map-pins', JSON.stringify(userPins)); }catch(e){}
+  renderPins([...DEFAULT_PINS, ...userPins]);
+  cancelPin();
+}
+function cancelPin(){
+  pendingPin=null;
+  document.getElementById('pin-form').classList.remove('show');
+  document.getElementById('pin-name').value='';
+  document.getElementById('pin-memo').value='';
+}
+
+/* ===== FORMULAS ===== */
+const FORMULAS = [
+  { expr:"σ' = σ − u", note:"有效应力 = 总应力 − 孔隙水压力。翻译：真正支撑你的，不是外界施加的全部压力，而是减去那些可以被排解的部分之后，你自己承受的核心。你一直都很擅长排解 u。" },
+  { expr:"q_f = c'N_c + σ'N_q + 0.5γBN_γ", note:"地基承载力公式。翻译：你的承载力来自三个源——c'（你天生的韧性）、σ'（你积累的经验覆盖）、γBN_γ（你脚下这片土地的宽度）。每一项你都不缺。" },
+  { expr:"U = 1 − (8/π²)·e^(−π²Tv/4)", note:"太沙基一维固结度。翻译：时间越长，固结越完全。你从福清到英国的那些年里，所有的压力和等待都在让你变得更密实、更坚固。现在的你，固结度已经很高了。" },
+  { expr:"τ = c' + σ'·tan(φ')", note:"摩尔-库仑强度准则。翻译：你的抗剪强度来自凝聚力 c'（内心的坚持）和摩擦力 σ'tan(φ')（与世界的接触面）。两者兼备，所以你从来不会被轻易推动。" },
+  { expr:"k = k₀·e^(−n)", note:"渗透系数与孔隙比。翻译：越致密的材料，渗透越慢。你经过这些年的固结，已经不容易被外界的东西轻易渗透了——这是一种难得的品质。" },
+  { expr:"FS = R / S ≥ 1.0", note:"安全系数 = 抗力 / 荷载。翻译：你的人生安全系数一直大于 1。不管生活给你施加多大的荷载，你的抗力总是够的。生日快乐，玟思。" }
+];
+(function(){
+  const grid = document.getElementById('formula-grid');
+  FORMULAS.forEach(f=>{
+    grid.innerHTML += `<div class="formula-card fade-in"><div class="formula-expr">${f.expr}</div><div class="formula-note">${f.note}</div></div>`;
+  });
+})();
+
+/* ===== POETRY COLLECTION ===== */
+const POEMS = [
+  { title:'坎贝尔', date:'2026.04.01',
+    text:`孤独在奔跑，
+潮水把整个城市都淹没。
+泪把背影折成一只越走越小的船，
+你的衣服在风里鼓成帆。
+
+你曾是我心底的河流。
+胸膛，一个春天的比喻正在老化。
+
+波光落尽，
+天地也两手空空。
+我的梦与骨都在醒来，
+你已安全地成为过去。` },
+  { title:'猫知道', date:'2026.02.01', sub:'写给我的小猫okie',
+    text:`膝头，幼小的太阳正在苏醒，
+整个房间开始旋转，
+你黑色的瞳孔里正映出一个完整的我。
+
+狭窄的房间，你跃起，
+掀起一场绒毛的狩猎，
+大地化作琴键，生机做你的舞曲
+你的注视是安宁对我的邀请。
+
+如果太阳也有泪水，
+氤氲在蒸发的永恒之中。
+只有你知道，
+只有我知道，
+即使世界千般模样，
+你是这样来到我生命里。
+
+城市亮起心跳，
+大地安睡在神明的膝头，
+光辉安歇在白色的毛尖。
+当所有渴望突然变得很轻，
+悲伤有了确切的形状和重量，
+就在这膝头，一瞬，又一瞬——
+你的尾尖划出一道行星的环，
+当永恒不再，
+时间就在此处蜷缩。` },
+  { title:'绿毛衣', date:'2026.04.14',
+    text:`很久很久以前，
+绿毛衣是你送我的新春季。
+很久很久以后，
+绿毛衣是我自己的新春季。
+
+如你所希望的，
+我长成了一棵树。
+脊梁也许弯了，
+可我还是挺拔又蓬勃。
+你问春天能不能变成秋天？
+
+泥土变小了，阳光变小了，
+毛衣变小了，日子变小了，
+我却在长大。
+白发是时间的逆运算，
+慢慢地把我拆开。
+
+泪水把我浸透，
+爱就变成了更深的颜色。
+我好想再缩回去，
+再穿上旧的冬季。
+
+无数个日子里，
+夜是沉重的线，
+人是穿引的针，
+越拉越紧——
+思念很重，灵魂透明，
+就好像没有什么能把我们分离。` },
+  { title:'小恐龙', date:'2026.05.09',
+    text:`童年似乎已经是上辈子的事了。
+动笔写下字句时，
+手下的笔画便像道路一样被它走过。
+长大和老去各是一次死亡，
+这一次，谁会在谁的土地上醒来？
+
+我从未抵达过我想象中的那片山坡，
+小小的斜坡，随处可见的野草遍地，
+此处萌芽，此处萎败，
+它们像静立的人，被吹动，
+静止的人，脚底生根，
+眉头紧皱，饱含痛苦的枯与荣。
+
+风正被分娩，
+很快也离它们而去。
+
+那么，
+诞生又是谁的旨意？
+幸福又是由谁来定义的？
+你是否也在确认我？
+
+请看着我，
+这个世界。
+这个时刻。
+
+一个被时间给予又回收的人，
+两种命运在同一片土地醒来。
+揭开杯盖，薛定谔的穹顶之下，
+一根木棍轻轻搅动，
+一代恐龙灭绝在，
+一杯回旋的白咖啡中。` },
+  { title:'浴室', date:'2025.03.31',
+    text:`一双眼睛眯着，像一件狭窄潮湿的浴室。
+她对着镜子，像两瓣唇一样拥挤着；
+女人的身份就像一张奖状，扒着墙。
+弓着的脊梁贴着瓷砖，这座房子就要倒了。
+
+她安稳地仰卧在浴缸，对水说了谎，
+活吧，这是你的泳池，
+活久一点，就都自由了。
+菩萨保佑你的衰老按时到来。
+
+水不知疲倦地在时间的表面转着圈，
+在女人的指尖留下些皱巴巴的白。` },
+  { title:'对白', date:'2025.03.01', sub:'致挚友洛木',
+    text:`在小雨的催促下，我们回家，
+窗户里面，一颗心大敞着，
+你愿意走进一个昨夜，
+抵着寒冷，剥开一颗冬天的心，
+世界最后的角落，
+我们在彼此怀里找到了世间的第一簇火，
+神也不能将它剥夺。
+
+吹灭月亮，已经足够暖和的房间，
+准备好一场好天气，
+明天，我会是一个丰足的人，
+不用栽种灵魂的柔软，
+阳光就会生长，
+我会守着自己的农田，
+屋房停站在我身后，
+明媚的日子住进来。
+
+我希望你是我生命的小溪，
+我不会担心潮湿，或是耳边的朦胧，
+你大声喊着春天亮了，
+我就望见灿烂的一切。` },
+  { title:'超市启示录', date:'2026.03.30',
+    text:`一条鱼翻了个身，
+发出铁一样的声响。
+在浅水中像鱼一样游动，
+尾巴拍打着沙滩。
+
+来世抢救的详细记录，
+光从上方倾泻而下，
+鱼的身体变成了一座巨大的坟墓，
+我用鲜活的海鲜喂养它——
+一路唱着生命——
+可它仍然没有被消化。
+
+深海区域，
+鱼咬住了自己的尾巴；
+我收回自由的权利，
+即使背负重担，
+一旦混入其中，便再无分别。
+
+鱼网一样的眼睛，
+收集着思念的目光，
+回到它的同类中去，
+塑料袋紧紧咬住指尖。` },
+  { title:'飞行日记', date:'2025.02.11',
+    text:`地上的儿，我已经看不见你，
+现在的你抬起头，我垂下脑袋。
+
+世界是被拼凑的神奇，
+雨水会完整它的美丽。
+
+跨越这千万万公里，
+强烈的气压压迫着我身体的柴火。
+
+再见福建，再见你的湿寒，
+不要让你的春天随我落地。` }
+];
+
+(function buildPoems(){
+  const grid = document.getElementById('poem-grid');
+  POEMS.forEach((p,i)=>{
+    const sub = p.sub ? `<div style="font-size:10px;opacity:.5;margin-top:4px">${p.sub}</div>` : '';
+    grid.innerHTML += `
+    <div class="poem-card fade-in" onclick="this.classList.toggle('flipped')">
+      <div class="poem-card-inner">
+        <div class="poem-front">
+          <div class="poem-front-top">
+            <div class="poem-title">《${p.title}》</div>
+            <div class="poem-author">温舍何</div>
+            ${sub}
+            <div class="poem-date">${p.date}</div>
+          </div>
+          <div class="poem-hint">— 点击翻开 —</div>
+        </div>
+        <div class="poem-back">
+          <button class="poem-back-close" onclick="event.stopPropagation();this.closest('.poem-card').classList.remove('flipped')">✕</button>
+          <div class="poem-back-title">《${p.title}》 · ${p.date}</div>
+          <div class="poem-back-text">${p.text}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+})();
+
+/* ===== TIME CAPSULE ===== */
+(function(){
+  const tc = document.getElementById('time-capsule');
+  const target = new Date('2026-07-24T00:00:00+01:00').getTime();
+  function tcTick(){
+    const now = Date.now(), diff = target - now;
+    if(diff <= 0){
+      tc.classList.add('unlocked');
+      return;
+    }
+    const d = Math.floor(diff/864e5), h = Math.floor(diff%864e5/36e5);
+    const m = Math.floor(diff%36e5/6e4), s = Math.floor(diff%6e4/1e3);
+    document.getElementById('tc-d').textContent = String(d).padStart(2,'0');
+    document.getElementById('tc-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('tc-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('tc-s').textContent = String(s).padStart(2,'0');
+  }
+  tcTick(); setInterval(tcTick, 1000);
+  // Allow unlock with URL parameter ?unlock=true for testing
+  if(new URLSearchParams(location.search).get('unlock')==='true'){
+    tc.classList.add('unlocked');
+  }
+  // Developer shortcut: Ctrl+Shift+U to bypass time capsule
+  document.addEventListener('keydown', function(e){
+    if(e.ctrlKey && e.shiftKey && e.key === 'U'){
+      tc.classList.add('unlocked');
+    }
+  });
+  // Click the lock icon to unlock (for preview/testing)
+  document.querySelector('.tc-lock-icon').addEventListener('click', function(){
+    tc.classList.add('unlocked');
+  });
+})();
+
+/* ===== SCROLL ANIMATIONS ===== */
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+},{threshold:0.15});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+/* ===== INTERACTIVE GLOBE ===== */
+function openGlobe(){
+  const m = document.getElementById('globe-modal');
+  m.style.display = 'flex';
+  requestAnimationFrame(()=>m.classList.add('open'));
+  if(!window._globeModalInited) initGlobeScene('globe-modal-box', true);
+  window._globeModalInited = true;
+}
+function closeGlobe(){
+  const m = document.getElementById('globe-modal');
+  m.classList.remove('open');
+  setTimeout(()=>m.style.display='none', 500);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeGlobe(); });
+
+function initGlobeScene(containerId, interactive){
+  const box = document.getElementById(containerId);
+  const W = box.clientWidth, H = box.clientHeight;
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(42, W/H, 0.1, 1000);
+  const ren = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  ren.setSize(W, H);
+  ren.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  ren.setClearColor(0x000000, 0);
+  box.appendChild(ren.domElement);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0x334466, 0.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+  sun.position.set(5, 2, 4);
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0x3366aa, 0.4);
+  rim.position.set(-4, -1, -3);
+  scene.add(rim);
+
+  const R = 1.5; // earth radius
+
+  // --- Build earth with real textures ---
+  const earthGeo = new THREE.SphereGeometry(R, 64, 64);
+  const loader = new THREE.TextureLoader();
+  loader.crossOrigin = 'anonymous';
+
+  // Procedural fallback texture
+  function makeFallbackTex(){
+    const c = document.createElement('canvas');
+    c.width = 2048; c.height = 1024;
+    const x = c.getContext('2d');
+    const g = x.createLinearGradient(0,0,0,1024);
+    g.addColorStop(0,'#1a4a7a'); g.addColorStop(0.15,'#1e5a90');
+    g.addColorStop(0.5,'#2070b0'); g.addColorStop(0.85,'#1e5a90'); g.addColorStop(1,'#1a4a7a');
+    x.fillStyle = g; x.fillRect(0,0,2048,1024);
+    // Add some noise for texture
+    const id = x.getImageData(0,0,2048,1024);
+    for(let i=0;i<id.data.length;i+=4){const n=(Math.random()-.5)*15;id.data[i]+=n;id.data[i+1]+=n;id.data[i+2]+=n;}
+    x.putImageData(id,0,0);
+    return new THREE.CanvasTexture(c);
+  }
+
+  // Cloud texture (procedural)
+  function makeCloudTex(){
+    const c = document.createElement('canvas');
+    c.width = 1024; c.height = 512;
+    const x = c.getContext('2d');
+    x.fillStyle = 'rgba(0,0,0,0)'; x.fillRect(0,0,1024,512);
+    // Draw cloud-like patches
+    for(let i = 0; i < 300; i++){
+      const cx = Math.random()*1024, cy = Math.random()*512;
+      const rx = 20+Math.random()*80, ry = 10+Math.random()*40;
+      const a = 0.02 + Math.random()*0.06;
+      x.beginPath();
+      x.ellipse(cx, cy, rx, ry, Math.random()*Math.PI, 0, Math.PI*2);
+      x.fillStyle = 'rgba(255,255,255,'+a+')';
+      x.fill();
+    }
+    // More clouds in tropical/mid latitudes
+    for(let i = 0; i < 200; i++){
+      const cx = Math.random()*1024, cy = 150+Math.random()*200;
+      const rx = 30+Math.random()*100, ry = 15+Math.random()*50;
+      x.beginPath();
+      x.ellipse(cx, cy, rx, ry, Math.random()*Math.PI, 0, Math.PI*2);
+      x.fillStyle = 'rgba(255,255,255,'+(0.03+Math.random()*0.08)+')';
+      x.fill();
+    }
+    return new THREE.CanvasTexture(c);
+  }
+
+  // Earth material - will be updated when texture loads
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: makeFallbackTex(),
+    shininess: 30,
+    specular: new THREE.Color(0x333333)
+  });
+  const earth = new THREE.Mesh(earthGeo, earthMat);
+  // Orient so China/UK face camera initially
+  earth.rotation.y = -1.8;
+  scene.add(earth);
+
+  // Try loading real NASA texture
+  const texURLs = [
+    'https://cdn.jsdelivr.net/npm/three-globe@2.24.5/example/img/earth-blue-marble.jpg',
+    'https://unpkg.com/three-globe@2.24.5/example/img/earth-blue-marble.jpg'
+  ];
+  let texLoaded = 0;
+  function tryLoadTexture(idx){
+    if(idx >= texURLs.length) return; // keep fallback
+    loader.load(texURLs[idx],
+      function(tex){
+        tex.anisotropy = ren.capabilities.getMaxAnisotropy();
+        earthMat.map = tex;
+        earthMat.needsUpdate = true;
+        texLoaded = 1;
+      },
+      undefined,
+      function(){ tryLoadTexture(idx+1); }
+    );
+  }
+  tryLoadTexture(0);
+
+  // Cloud layer
+  const cloudGeo = new THREE.SphereGeometry(R * 1.01, 48, 48);
+  const cloudMat = new THREE.MeshPhongMaterial({
+    map: makeCloudTex(),
+    transparent: true,
+    opacity: 0.35,
+    depthWrite: false
+  });
+  const clouds = new THREE.Mesh(cloudGeo, cloudMat);
+  earth.add(clouds);
+
+  // Atmosphere glow
+  const atmosGeo = new THREE.SphereGeometry(R * 1.12, 64, 64);
+  const atmosMat = new THREE.ShaderMaterial({
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      void main(){
+        vNormal = normalize(normalMatrix * normal);
+        vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      void main(){
+        vec3 viewDir = normalize(-vPosition);
+        float rim = 1.0 - max(0.0, dot(viewDir, vNormal));
+        float intensity = pow(rim, 3.0) * 1.8;
+        vec3 col = mix(vec3(0.2, 0.5, 1.0), vec3(0.4, 0.7, 1.0), rim);
+        gl_FragColor = vec4(col, intensity * 0.7);
+      }
+    `,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    transparent: true,
+    depthWrite: false
+  });
+  scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+  // Cities
+  const cities = [
+    {name:'福清', lat:25.7, lon:119.4, color:0xff5555},
+    {name:'Guildford', lat:51.2, lon:-0.57, color:0x55dd77},
+    {name:'Leeds', lat:53.8, lon:-1.55, color:0x5599ff}
+  ];
+  function ll2v(lat,lon,r){
+    const phi=(90-lat)*Math.PI/180, theta=(lon+180)*Math.PI/180;
+    return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+  }
+
+  // City markers — small glowing dots with beam
+  const mkGroup = new THREE.Group();
+  cities.forEach(c=>{
+    const surfPos = ll2v(c.lat, c.lon, R);
+    // Core marker dot
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 16, 16),
+      new THREE.MeshBasicMaterial({color: c.color})
+    );
+    dot.position.copy(surfPos);
+    mkGroup.add(dot);
+
+    // Glow sprite (canvas-generated radial gradient)
+    const spriteCanvas = document.createElement('canvas');
+    spriteCanvas.width = 64; spriteCanvas.height = 64;
+    const sctx = spriteCanvas.getContext('2d');
+    const sg = sctx.createRadialGradient(32,32,0,32,32,32);
+    const hex = '#'+new THREE.Color(c.color).getHexString();
+    sg.addColorStop(0, hex);
+    sg.addColorStop(0.3, hex+'aa');
+    sg.addColorStop(1, hex+'00');
+    sctx.fillStyle = sg;
+    sctx.fillRect(0,0,64,64);
+    const spriteTex = new THREE.CanvasTexture(spriteCanvas);
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: spriteTex, transparent:true, opacity:0.8, depthTest:false
+    }));
+    sprite.position.copy(surfPos);
+    sprite.scale.set(0.2, 0.2, 1);
+    sprite.userData = {baseScale: 0.2};
+    mkGroup.add(sprite);
+
+    // Thin beam going up
+    const topPos = ll2v(c.lat, c.lon, R + 0.22);
+    const beamGeo = new THREE.BufferGeometry().setFromPoints([surfPos, topPos]);
+    mkGroup.add(new THREE.Line(beamGeo, new THREE.LineBasicMaterial({
+      color: c.color, transparent:true, opacity:0.6
+    })));
+
+    // Tiny top cap
+    const cap = new THREE.Mesh(
+      new THREE.SphereGeometry(0.012, 8, 8),
+      new THREE.MeshBasicMaterial({color: c.color})
+    );
+    cap.position.copy(topPos);
+    mkGroup.add(cap);
+  });
+  scene.add(mkGroup);
+
+  // Arcs between cities — gradient colored curves
+  const arcPairs = [[0,1],[1,2],[0,2]];
+  const arcGroup = new THREE.Group();
+  arcPairs.forEach(([a,b])=>{
+    const s = ll2v(cities[a].lat, cities[a].lon, R + 0.01);
+    const e = ll2v(cities[b].lat, cities[b].lon, R + 0.01);
+    const dist = s.distanceTo(e);
+    const mid = s.clone().add(e).multiplyScalar(0.5);
+    mid.normalize().multiplyScalar(R + dist * 0.35);
+    const curve = new THREE.QuadraticBezierCurve3(s, mid, e);
+    const pts = curve.getPoints(100);
+
+    // Create gradient arc using vertex colors
+    const arcGeo = new THREE.BufferGeometry().setFromPoints(pts);
+    const arcColors = [];
+    const cA = new THREE.Color(cities[a].color);
+    const cB = new THREE.Color(cities[b].color);
+    for(let i = 0; i <= 100; i++){
+      const t = i/100;
+      const c = cA.clone().lerp(cB, t);
+      arcColors.push(c.r, c.g, c.b);
+    }
+    arcGeo.setAttribute('color', new THREE.Float32BufferAttribute(arcColors, 3));
+    const arcMat = new THREE.LineBasicMaterial({
+      vertexColors: true, transparent: true, opacity: 0.55
+    });
+    arcGroup.add(new THREE.Line(arcGeo, arcMat));
+  });
+  scene.add(arcGroup);
+
+  // Stars (subtle)
+  const starGeo = new THREE.BufferGeometry();
+  const starPos = new Float32Array(6000);
+  for(let i = 0; i < 6000; i++) starPos[i] = (Math.random()-0.5)*80;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({
+    size:0.05, color:0xbbddff, transparent:true, opacity:0.5, sizeAttenuation:true
+  })));
+
+  // Orbit controls
+  const sph = new THREE.Spherical(3.5, Math.PI/2.3, 0);
+  let dragging = false, prev = {x:0,y:0}, autoRot = !interactive;
+  let autoRotTimer = null;
+
+  function updCam(){
+    cam.position.setFromSpherical(sph);
+    cam.lookAt(0,0,0);
+  }
+  updCam();
+
+  const cvs = ren.domElement;
+  cvs.addEventListener('pointerdown', e=>{
+    dragging=true; prev={x:e.clientX,y:e.clientY}; autoRot=false;
+    if(autoRotTimer) clearTimeout(autoRotTimer);
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    sph.theta -= (e.clientX - prev.x) * 0.006;
+    sph.phi = Math.max(0.2, Math.min(Math.PI-0.2, sph.phi + (e.clientY - prev.y) * 0.006));
+    prev = {x:e.clientX, y:e.clientY};
+    updCam();
+  });
+  window.addEventListener('pointerup', ()=>{
+    dragging = false;
+    if(interactive){
+      autoRotTimer = setTimeout(()=>{ if(!dragging) autoRot=true; }, 4000);
+    }
+  });
+  cvs.addEventListener('wheel', e=>{
+    e.preventDefault();
+    sph.radius = Math.max(2.0, Math.min(8, sph.radius + e.deltaY * 0.004));
+    updCam();
+  }, {passive:false});
+
+  // Touch
+  let lastTD = 0;
+  cvs.addEventListener('touchstart', e=>{
+    if(e.touches.length===1){dragging=true;prev={x:e.touches[0].clientX,y:e.touches[0].clientY};autoRot=false;}
+    if(e.touches.length===2) lastTD=Math.hypot(e.touches[1].clientX-e.touches[0].clientX, e.touches[1].clientY-e.touches[0].clientY);
+  },{passive:true});
+  cvs.addEventListener('touchmove', e=>{
+    e.preventDefault();
+    if(e.touches.length===1 && dragging){
+      sph.theta -= (e.touches[0].clientX-prev.x)*0.006;
+      sph.phi = Math.max(0.2, Math.min(Math.PI-0.2, sph.phi+(e.touches[0].clientY-prev.y)*0.006));
+      prev = {x:e.touches[0].clientX, y:e.touches[0].clientY}; updCam();
+    }
+    if(e.touches.length===2){
+      const d = Math.hypot(e.touches[1].clientX-e.touches[0].clientX, e.touches[1].clientY-e.touches[0].clientY);
+      sph.radius = Math.max(2.0, Math.min(8, sph.radius-(d-lastTD)*0.015));
+      lastTD = d; updCam();
+    }
+  },{passive:false});
+  cvs.addEventListener('touchend', ()=>{
+    dragging=false;
+    if(interactive) autoRotTimer=setTimeout(()=>{if(!dragging)autoRot=true;},4000);
+  });
+
+  // Animation loop
+  const clock = new THREE.Clock();
+  (function anim(){
+    requestAnimationFrame(anim);
+    const dt = clock.getDelta();
+    const t = clock.getElapsedTime();
+
+    if(autoRot) sph.theta += 0.002;
+    updCam();
+
+    // Slow cloud rotation
+    clouds.rotation.y += dt * 0.01;
+
+    // Pulse city glow sprites
+    mkGroup.children.forEach(child => {
+      if(child.isSprite && child.userData.baseScale){
+        const pulse = child.userData.baseScale * (1 + Math.sin(t*3 + child.id)*0.25);
+        child.scale.set(pulse, pulse, 1);
+      }
+    });
+
+    ren.render(scene, cam);
+  })();
+
+  window.addEventListener('resize', ()=>{
+    const w = box.clientWidth, h = box.clientHeight;
+    cam.aspect = w/h; cam.updateProjectionMatrix();
+    ren.setSize(w, h);
+  });
+}
+
+// Lazy-init widget globe on scroll
+(function(){
+  const obs=new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting){initGlobeScene('globe-widget',false);obs.disconnect();}
+  },{threshold:0.2});
+  obs.observe(document.getElementById('globe-widget'));
+})();
+
+/* ===== NAV DOT ACTIVE STATE ===== */
+const sections = ['hero','soil','specimen','map-sec','globe-sec','formulas','letter','poetry'];
+const dots = document.querySelectorAll('.nav-dots a');
+window.addEventListener('scroll',()=>{
+  let cur = 0;
+  sections.forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(el && el.getBoundingClientRect().top < window.innerHeight/2) cur = i;
+  });
+  dots.forEach((d,i)=>d.classList.toggle('active', i===cur));
+});
+</script>
+</body>
+</html>
