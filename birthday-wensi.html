@@ -1041,8 +1041,8 @@ function toggleLayer(el){ el.classList.toggle('expanded'); }
   box.addEventListener('pointerdown',e=>{dragging=true;prev={x:e.clientX,y:e.clientY}});
   window.addEventListener('pointermove',e=>{
     if(!dragging)return;
-    rot.y+=(e.clientX-prev.x)*.008;
-    rot.x+=(e.clientY-prev.y)*.008;
+    rot.y-=(e.clientX-prev.x)*.008;
+    rot.x-=(e.clientY-prev.y)*.008;
     prev={x:e.clientX,y:e.clientY};
   });
   window.addEventListener('pointerup',()=>dragging=false);
@@ -1078,7 +1078,7 @@ function renderPins(pins){
   });
 }
 let userPins = [];
-try{ userPins = JSON.parse(sessionStorage.getItem('wensi-map-pins')||'[]'); }catch(e){}
+try{ userPins = JSON.parse(localStorage.getItem('wensi-map-pins')||'[]'); }catch(e){}
 renderPins([...DEFAULT_PINS, ...userPins]);
 
 mapArea.addEventListener('click', function(e){
@@ -1093,7 +1093,7 @@ function confirmPin(){
   pendingPin.name = document.getElementById('pin-name').value || '未命名';
   pendingPin.memo = document.getElementById('pin-memo').value || '';
   userPins.push(pendingPin);
-  try{ sessionStorage.setItem('wensi-map-pins', JSON.stringify(userPins)); }catch(e){}
+  try{ localStorage.setItem('wensi-map-pins', JSON.stringify(userPins)); }catch(e){}
   renderPins([...DEFAULT_PINS, ...userPins]);
   cancelPin();
 }
